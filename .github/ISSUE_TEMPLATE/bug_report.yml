@@ -1,0 +1,46 @@
+name: Bug report
+description: Something in Signal Console does not work as described.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste data from a host you investigated (run files, host names, user names, addresses or screenshots of them).
+        To report a vulnerability, do not open an issue: see SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: Console version
+      description: Shown at the top left of the console.
+      placeholder: "0.124.0"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, Node.js version (node --version) and browser.
+      placeholder: "Windows Server 2022, Node.js 22.11, Edge 131"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Click ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console output or error messages
+      description: From the terminal running the console, or the browser's developer console. Remove any host data first.
+      render: text

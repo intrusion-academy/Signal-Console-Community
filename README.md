@@ -33,8 +33,11 @@ Signal writes on each host and shows all hosts in one place.
 4. [Configuration](#configuration)
 5. [Accounts](#accounts)
 6. [Security](#security)
-7. [Editions](#editions)
-8. [License](#license)
+7. [Updating](#updating)
+8. [FAQ](#faq)
+9. [Getting help](#getting-help)
+10. [Editions](#editions)
+11. [License](#license)
 
 <br>
 
@@ -171,6 +174,54 @@ Manage accounts on **Settings > Users**, or on the server:
 | Transport | Use HTTPS beyond a single machine (see [Configuration](#configuration)) |
 
 To report a vulnerability, see [SECURITY.md](SECURITY.md).
+
+<br>
+
+## Updating
+
+Your data stays in the data folder (`data/` or `SIGNAL_CONSOLE_DATA`) and is
+kept across updates. Back it up first, then:
+
+```bash
+git pull
+npm ci --omit=dev
+npm start
+```
+
+Changes in each release are listed in [CHANGELOG.md](CHANGELOG.md).
+
+<br>
+
+## FAQ
+
+**Where do I get `signal.exe`?**
+From Intrusion Academy at [intrusion.academy/signal](https://intrusion.academy/signal). It is not in this repository.
+
+**Does the console send data anywhere?**
+It sends no telemetry and no investigation data. Every 6 hours it checks `signal-update.intrusion.academy` for a new version; the request carries nothing about your hosts, and the result is shown on **Settings > Updates**. Lookups in VirusTotal, NVD and the CISA KEV catalog run only when an administrator turns them on or starts them.
+
+**Does Signal change the hosts it runs on?**
+No. Signal is read-only: it installs nothing, starts no service and writes only its own run file.
+
+**Which hosts can Signal survey?**
+Windows 10, Windows 11 and Windows Server.
+
+**A run file is refused on import. Why?**
+The console checks each file against Signal's output contract and shows the reason. A file from a newer version of Signal needs a newer console.
+
+**Can I use the Community Edition for client work?**
+No. Services to third parties need a commercial license (Pro or Enterprise). See [License](#license).
+
+<br>
+
+## Getting help
+
+| Need | Where |
+|---|---|
+| How to use Signal and the console | [Documentation](https://intrusion.academy/signal/doc/latest) |
+| A bug or an improvement | [Open an issue](../../issues/new/choose) (never include host data) |
+| A security vulnerability | [SECURITY.md](SECURITY.md) (report privately) |
+| Pro, Enterprise, services, training | [intrusion.academy/signal](https://intrusion.academy/signal) |
 
 <br>
 

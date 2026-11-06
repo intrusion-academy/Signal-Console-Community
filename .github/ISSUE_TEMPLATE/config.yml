@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://intrusion.academy/signal/doc/latest
+    about: How to use Signal and Signal Console.
+  - name: Download Signal, Pro and Enterprise editions
+    url: https://intrusion.academy/signal
+    about: The Signal executable, commercial editions, services and training.
+  - name: Report a vulnerability
+    url: https://intrusion.academy/signal
+    about: Report privately, as described in SECURITY.md. Do not open a public issue.
