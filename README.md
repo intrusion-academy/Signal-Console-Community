@@ -74,13 +74,15 @@ another port; `SIGNAL_CONSOLE_DATA` sets a data folder other than `data/`.
 
 ### Collecting and importing runs
 
-1. Run Signal on each host and write the run file to a folder you collect, for example a share:
+1. Download Signal (`signal.exe`) from Intrusion Academy at [intrusion.academy/signal](https://intrusion.academy/signal). Signal is not included in this repository.
+
+2. Run Signal on each host and write the run file to a folder you collect, for example a share:
 
    ```
    signal live -all -o \\fileserver\signal-runs\
    ```
 
-2. Sign in, open **Import** and select the run files. An upload takes up to 200 files of up to 50 MB each. Each file is validated against Signal's output contract before it is stored; a file from a newer version of Signal is refused with the reason.
+3. Sign in, open **Import** and select the run files. An upload takes up to 200 files of up to 50 MB each. Each file is validated against Signal's output contract before it is stored; a file from a newer version of Signal is refused with the reason.
 
 The console holds one set of runs. Runs can be removed on the Import page.
 
