@@ -248,7 +248,7 @@ Copyright 2026 Intrusion Academy. Licensed under the
 **Signal Community License 1.0.0** ([LICENSE](LICENSE), [NOTICE](NOTICE)).
 In summary (the license text prevails):
 
-| | |
+| Use | Terms |
 |---|---|
 | **Allowed** | Use, study and modify, free of charge, to defend the computers and networks you or your organisation own or operate. Personal, educational and non-commercial research use. |
 | **Requires a commercial license** | Services to third parties (incident response, compromise or gap assessments, threat hunting, managed detection), resale or redistribution, or use in another product. |
