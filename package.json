@@ -1,6 +1,6 @@
 {
   "name": "signal-console-community",
-  "version": "0.124.0",
+  "version": "1.0.0",
   "description": "Signal DFIR Survey: The First Minute of Every Investigation. Where to Look & What You Can't See! - Signal Console imports Signal JSON output and presents alerts, dashboards and reports across one or many hosts.",
   "main": "server.js",
   "license": "SEE LICENSE IN LICENSE",

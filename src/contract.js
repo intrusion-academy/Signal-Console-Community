@@ -23,6 +23,13 @@ const TELEMETRY_STATES = new Set(['on', 'off', 'absent', 'unknown']);
 const RULE_STATUSES = new Set(['flagged', 'clear', 'not_run']);
 const SOURCE_STATUSES = new Set(['read', 'partial', 'not_read', 'unavailable']);
 
+// MIN_SIGNAL_MAJOR is the oldest Signal major version whose runs are
+// accepted: every run before Signal 1.0.0 (the first release) is refused.
+// signalMajor reads the major number from a version such as "1.2.3" or
+// "1.0.0-rc1"; anything without one is 0, so it is refused too.
+const MIN_SIGNAL_MAJOR = 1;
+const signalMajor = (v) => { const m = /^(\d+)\./.exec(typeof v === 'string' ? v : ''); return m ? Number(m[1]) : 0; };
+
 const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const isString = (v) => typeof v === 'string';
 
@@ -32,6 +39,11 @@ function problems(doc) {
   const out = [];
   if (!validRunId(doc.run_id)) out.push('run_id missing or invalid (letters, digits and dashes only)');
   if (!isObject(doc.modules)) out.push('modules must be an object');
+  if (signalMajor(doc.tool_version) < MIN_SIGNAL_MAJOR) {
+    out.push(`this run is from Signal ${doc.tool_version || '(version not stated)'}, older than Signal ${MIN_SIGNAL_MAJOR}.0.0 - Signal Console ${CONSOLE_VERSION} accepts runs from Signal ${MIN_SIGNAL_MAJOR}.0.0 or later only, so it was not stored; `
+      + `update Signal on the host (signal update) and run it again`);
+    return out;
+  }
   const version = Number(doc.schema_version) || 0;
   if (version > CURRENT) {
     out.push(`this run is from a newer Signal (${doc.tool_version ? `version ${doc.tool_version}, ` : ''}output schema ${version}) than this Signal Console ${CONSOLE_VERSION} reads (schema ${CURRENT} at most), so it was not stored - `

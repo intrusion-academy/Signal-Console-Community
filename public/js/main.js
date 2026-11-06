@@ -167,7 +167,7 @@ function drawHeader() {
 function editionBadge(ed) {
   const community = ed.edition === 'community';
   const tip = community
-    ? `Community edition: licensed, free of charge, solely to defend the computers and networks you own or operate. Services to third parties, resale, redistribution and incorporation into another product require a commercial license (Pro or Enterprise) from Intrusion Academy.${ed.problem ? ` (${ed.problem})` : ''} See the License page.`
+    ? `Community edition: licensed, free of charge, solely to defend the computers, networks and systems you or your organisation own or operate, and for personal, educational and non-commercial research use. Services to third parties, resale, redistribution outside your organisation and incorporation into another product require a commercial license (Pro or Enterprise) from Intrusion Academy.${ed.problem ? ` (${ed.problem})` : ''} See the License page.`
     : `${ed.label}, licensed to ${ed.customer} until ${String(ed.expires).slice(0, 10)}. See the license.`;
   return pageLink('license', {}, h('span', { class: `about-edition ${community ? 'edition-community' : 'edition-licensed'}`, title: tip }, svgIcon('license'),` ${community ? 'Community' : ed.label.replace(' edition', '')}`));
 }
