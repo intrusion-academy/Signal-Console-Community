@@ -1,0 +1,1177 @@
+/* Signal Console - the app's one stylesheet. The Rules page's look is the house
+   style for every page: text-only colored tags, icon column headers with
+   hover tooltips, a sticky filter bar card, a summary strip, detail panels
+   in spaced sections, flat dark code blocks, and plain accent links.
+
+   The look (0.79.0): sharp and flat - neutral graphite surfaces, one
+   steel-blue accent, a 2px corner (--r), cards framed by corner brackets,
+   monospace capitals for labels and figures, a faint board grid behind the
+   page, and quick motion that prefers-reduced-motion turns off.
+
+   CSS variables carry both the light and dark palettes, so every component
+   reads its colors from one place. The dark values apply when the
+   browser/OS is in dark mode, unless the header's theme button chose light
+   (html[data-theme=light]); that button's dark (html[data-theme=dark])
+   applies them whatever the OS says. */
+:root {
+  /* --bd is dark enough to show on both the page and a card: every table,
+     card and control outline in light mode depends on it. */
+  /* Neutral graphite surfaces, one flat steel-blue accent. --raise is a
+     surface one step above a card (headers, hover); --grid the faint
+     investigation-board lines behind the page. */
+  --bg: #eceef1; --card: #fbfbfc; --raise: #f2f3f5; --fg: #14181d; --mut: #5b6470; --bd: #c6ccd3; --grid: rgba(20, 24, 29, .045);
+  --acc: #2c6aa8; --hi: #dc2626; --med: #d97706; --ok: #16a34a; --attn: #fb923c; --unreviewed: #eab308;
+  /* Sharp: one small corner for every box; quick, mechanical motion. */
+  --r: 2px; --ease: cubic-bezier(.2, .7, .2, 1); --t: .16s;
+  --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  /* Text-only tag colors (.tagtext): one distinct hue per value that can
+     share a column - severities, rule outcomes, event statuses - so no two
+     different tags in the same column ever look alike. */
+  --sev-critical: #db2777; --sev-high: #dc2626; --sev-medium: #ea580c; --sev-low: #a16207; --ev-policy-off: #0891b2;
+  --st-flagged: #dc2626; --st-ran: #15803d; --approved: #0e7490; --manual: #c026d3; --st-notrun: #7c3aed; --origin-imported: #0f766e;
+  /* Code block (a rule's detection logic): flat dark in both themes, with
+     muted token colors - distinct from each other, never loud. */
+  --code-bg: #1e222a; --code-bd: #2c323d; --code-fg: #d7dae0;
+  --code-comment: #7f8896; --code-sel: #c4a7e7; --code-field: #7fbadc; --code-mod: #e0c07b; --code-val: #98c379; --code-kw: #d19a66;
+  --mono: "Cascadia Mono", "Cascadia Code", ui-monospace, Consolas, "Courier New", monospace;
+  /* Chart series (the logon trend): a categorical pair checked with the
+     dataviz palette validator against each theme's card surface - lightness
+     band, chroma, colour-blind and normal-vision separation, contrast. */
+  --chart-logons: #2563eb; --chart-failures: #d97706;
+  --brand-mark: url(/img/signal-mark-light.png); /* the logo's mark: flat blue (light), its gradient (dark) */
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c0e11; --card: #13161a; --raise: #191d22; --fg: #e3e6ea; --mut: #8d96a1; --bd: #2a3038; --grid: rgba(227, 230, 234, .028);
+    --acc: #6ea8dc; --hi: #f87171; --med: #fbbf24; --ok: #4ade80;
+    --sev-critical: #f472b6; --sev-high: #f87171; --sev-medium: #fb923c; --sev-low: #facc15; --ev-policy-off: #22d3ee;
+    --st-flagged: #f87171; --st-ran: #4ade80; --approved: #5eead4; --manual: #e879f9; --st-notrun: #a78bfa; --origin-imported: #2dd4bf;
+    --code-bg: #12151b; --code-bd: #262c36;
+    --chart-logons: #3b82f6; --chart-failures: #d97706;
+    --brand-mark: url(/img/signal-mark-dark.png);
+  }
+}
+/* The same dark palette, chosen with the theme button. */
+:root[data-theme="dark"] {
+  --bg: #0c0e11; --card: #13161a; --raise: #191d22; --fg: #e3e6ea; --mut: #8d96a1; --bd: #2a3038; --grid: rgba(227, 230, 234, .028);
+  --acc: #6ea8dc; --hi: #f87171; --med: #fbbf24; --ok: #4ade80;
+  --sev-critical: #f472b6; --sev-high: #f87171; --sev-medium: #fb923c; --sev-low: #facc15; --ev-policy-off: #22d3ee;
+  --st-flagged: #f87171; --st-ran: #4ade80; --approved: #5eead4; --manual: #e879f9; --st-notrun: #a78bfa; --origin-imported: #2dd4bf;
+  --code-bg: #12151b; --code-bd: #262c36;
+  --chart-logons: #3b82f6; --chart-failures: #d97706;
+  --brand-mark: url(/img/signal-mark-dark.png);
+  color-scheme: dark;
+}
+:root[data-theme="light"] { color-scheme: light; }
+
+/* ---- Page frame ---------------------------------------------------- */
+* { box-sizing: border-box; }
+/* The page sits on a faint 24px board grid: flat, quiet, behind everything. */
+body { margin: 0; color: var(--fg); font: 14px/1.55 var(--sans); display: flex; min-height: 100vh;
+  background-color: var(--bg); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px; background-attachment: fixed; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+::selection { background: color-mix(in srgb, var(--acc) 30%, transparent); }
+.shell { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+/* The top bar: flat, its lower edge an accent rule that fades out. */
+header { position: relative; padding: 4px 24px; background: var(--card); border-bottom: 1px solid var(--bd); display: flex; align-items: center; gap: 20px; min-height: 42px; }
+header::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 220px; height: 1px; background: linear-gradient(90deg, var(--acc), transparent); }
+.header-right { margin-left: auto; display: flex; gap: 12px; align-items: center; font-size: 12px; }
+.header-right button.ghost { padding: 3px 10px; font-size: 12px; }
+
+/* ---- Side navigation (main.js buildNav) ------------------------------ */
+/* Collapsed by default: icons only, each page named in a hover card;
+   expanded (the toggle at its foot), each icon has its page's name. */
+.sidebar { position: sticky; top: 0; left: 0; height: 100vh; flex: none; width: 56px; display: flex; flex-direction: column; gap: 4px; padding: 10px 8px;
+  background: var(--card); border-right: 1px solid var(--bd); z-index: 40; transition: width .2s var(--ease); }
+.sidebar.expanded { width: 196px; }
+.brand { display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 5px; margin-bottom: 10px; font-size: 16px; white-space: nowrap; }
+/* The logo: its mark (per theme) and its SIGNAL wordmark, a mask in the text's colour. */
+.brand-mark { flex: none; width: 28px; height: 28px; background: var(--brand-mark) center / contain no-repeat; }
+.brand-name { display: flex; align-items: baseline; gap: 6px; }
+.brand-word { display: inline-block; width: 74px; height: 12px; background: var(--fg); -webkit-mask: url(/img/signal-wordmark.png) center / contain no-repeat; mask: url(/img/signal-wordmark.png) center / contain no-repeat; }
+.brand-name .mut { font-size: 13px; }
+/* The top bar's left: the console's version and its author, quiet. */
+.header-about { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--mut); white-space: nowrap; }
+.header-about .about-version { padding: 1px 7px; border: 1px solid var(--bd); border-radius: var(--r); font-size: 11px; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.header-about a { color: var(--fg); text-decoration: none; font-weight: 500; }
+/* The edition badge: Community in the warning colour, a license in green. */
+.header-about .about-edition { display: inline-flex; align-items: center; gap: 2px; padding: 1px 7px; border: 1px solid currentColor; border-radius: var(--r); font-size: 11px; }
+.edition-community { color: var(--med); }
+.edition-licensed { color: var(--ok); }
+.header-about a:hover { color: var(--acc); text-decoration: underline; }
+.header-right { white-space: nowrap; }
+/* A narrow window keeps the author's name: "Developed by" goes first, and
+   below 640px the bar wraps to two lines. */
+@media (max-width: 960px) { .header-about .about-by { display: none; } }
+@media (max-width: 640px) { header { flex-wrap: wrap; row-gap: 4px; padding: 6px 12px; } .header-right { margin-left: 0; flex-wrap: wrap; white-space: normal; } }
+/* The License page: the license and notice as readable text. */
+.license-text { max-width: 78ch; line-height: 1.6; }
+.license-text h3 { margin: 18px 0 6px; font-size: 14px; }
+.license-text p { margin: 0 0 10px; }
+.license-text pre { white-space: pre-wrap; font-size: 12px; }
+/* The pages scroll within the sidebar when the window is shorter than
+   the list; the brand and the toggle stay in place. */
+.sidebar nav { display: flex; flex-direction: column; gap: 4px; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+.sidebar nav::-webkit-scrollbar { display: none; } /* scrolls by wheel, touch and keyboard, with no bar beside the icons */
+.sidebar nav > * { flex: none; } /* the buttons and the separator keep their size; the list scrolls instead */
+.sidebar nav button, .nav-toggle { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; height: 38px; padding: 0 11px;
+  background: none; border: 0; border-radius: var(--r); color: var(--mut); cursor: pointer; font: inherit; white-space: nowrap; text-align: left;
+  transition: background var(--t) var(--ease), color var(--t) var(--ease); }
+.sidebar nav button .icon svg, .nav-toggle .icon svg { width: 18px; height: 18px; transition: transform var(--t) var(--ease); }
+.sidebar nav button:hover, .nav-toggle:hover { background: var(--raise); color: var(--fg); }
+.sidebar nav button:hover .icon svg { transform: translateX(1px); }
+/* The current page: a tinted row and an accent bar at its left edge that slides in. */
+.sidebar nav button::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2px; background: var(--acc); transform: scaleY(0); transition: transform .22s var(--ease); }
+.sidebar nav button.on { background: color-mix(in srgb, var(--acc) 14%, transparent); color: var(--fg); }
+.sidebar nav button.on .icon { color: var(--acc); }
+.sidebar nav button.on::before { transform: scaleY(1); }
+/* A data page not reviewed on every host: a yellow mark on its icon (reviews). */
+.sidebar nav button.unreviewed::after { content: ''; position: absolute; left: 24px; top: 7px; width: 8px; height: 8px; border-radius: 50%; background: var(--unreviewed); box-shadow: 0 0 0 2px var(--bg-side, var(--bg)); }
+.review-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 14px; margin-bottom: 12px; border-left: 3px solid var(--unreviewed); }
+.review-bar.done { border-left-color: var(--ok); }
+.review-bar .review-state { font-weight: 600; }
+.vt-tag { font-size: 11.5px; }
+.vt-form { display: grid; gap: 10px; margin: 14px 0 6px; }
+.vt-form > div { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.vt-form input.cond-value { max-width: 460px; }
+.vt-form input.cond-value.num { width: 100px; margin-left: 6px; }
+.settings-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 16px; align-items: start; }
+.settings-nav { position: sticky; top: 12px; display: flex; flex-direction: column; gap: 2px; padding: 8px; background: var(--card); border: 1px solid var(--bd); border-radius: var(--r); }
+.settings-nav .chip { border: 0; border-radius: var(--r); padding: 8px 12px; text-align: left; }
+.settings-nav .chip:not(.on):hover { background: color-mix(in srgb, var(--acc) 8%, transparent); }
+@media (max-width: 720px) { .settings-layout { grid-template-columns: 1fr; } .settings-nav { position: static; flex-direction: row; flex-wrap: wrap; } }
+.sidebar nav button:focus-visible, .nav-toggle:focus-visible { outline: 2px solid var(--acc); outline-offset: 1px; }
+.sidebar nav button[hidden] { display: none; } /* a data page with nothing to show (main.js hideEmptyPages) */
+.nav-toggle { margin-top: auto; }
+/* The divider between the hosts' data and Signal's own (rules, modules). */
+.nav-sep { height: 1px; margin: 8px 6px; background: repeating-linear-gradient(90deg, var(--bd) 0 4px, transparent 4px 7px); }
+.sidebar:not(.expanded) .nav-label { display: none; }
+/* Fixed, placed at its icon by main.js (placeTip): the scrolling list
+   would clip a tip inside it. */
+.nav-tip { display: none; position: fixed; z-index: 60; transform: translateY(-50%); white-space: nowrap; padding: 5px 10px; border-radius: var(--r);
+  background: var(--fg); color: var(--card); font-size: 12px; font-weight: 600; letter-spacing: .02em; pointer-events: none; box-shadow: 0 4px 12px rgba(0, 0, 0, .18); }
+.sidebar:not(.expanded) nav button:hover .nav-tip, .sidebar:not(.expanded) nav button:focus-visible .nav-tip { display: block; animation: tip-side-in .14s var(--ease); }
+@keyframes tip-side-in { from { opacity: 0; margin-left: -6px; } }
+@media (prefers-reduced-motion: reduce) { .sidebar { transition: none; } }
+.header-right .btn { font-size: 12px; }
+.icon-btn.ghost .icon svg { width: 15px; height: 15px; }
+.ghost.icon-btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 6px; }
+.btn.icon-btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 6px; }
+.btn.icon-btn .icon svg { width: 15px; height: 15px; }
+button.theme-btn { background: none; border: 1px solid var(--bd); color: var(--fg); border-radius: var(--r); cursor: pointer; transition: border-color var(--t), color var(--t); }
+button.theme-btn .icon svg { transition: transform .4s var(--ease); }
+button.theme-btn:hover .icon svg { transform: rotate(40deg); }
+button.theme-btn:hover { border-color: var(--acc); color: var(--acc); }
+.header-right .btn.on { box-shadow: 0 0 0 2px color-mix(in srgb, var(--acc) 35%, transparent); }
+main { padding: 20px 22px; width: 100%; max-width: 1400px; margin: 0 auto; }
+.mut { color: var(--mut); }
+a { color: var(--acc); text-decoration: none; text-underline-offset: 3px; transition: color var(--t); }
+a:hover { text-decoration: underline; }
+/* Keyboard focus: one crisp accent outline everywhere. */
+:focus-visible { outline: 1px solid var(--acc); outline-offset: 2px; }
+
+/* ---- Motion ----------------------------------------------------------- */
+/* A page rises into place as it arrives, its cards one after another; an
+   opened row, a hover card and a menu unfold. Fill "backwards" only, so no
+   transform stays behind to trap the fixed hover cards or sticky bars. */
+#app > * { animation: rise-in .32s var(--ease) backwards; }
+#app > * > :is(.card, .grid, .dash-grid, section) { animation: rise-in .38s var(--ease) backwards; }
+#app > * > :nth-child(2) { animation-delay: .04s; } #app > * > :nth-child(3) { animation-delay: .08s; }
+#app > * > :nth-child(4) { animation-delay: .12s; } #app > * > :nth-child(5) { animation-delay: .16s; }
+#app > * > :nth-child(n+6) { animation-delay: .2s; }
+@keyframes rise-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes drop-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+.mono { font: 12.5px/1.5 var(--mono); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+/* Controls, tables and forms never touch what is stacked above or below
+   them: one space between stacked blocks, everywhere. */
+:is(.row, .facts, .data-table, .vt-form, .stack-form, .dash-grid) + *, * + :is(.row, .facts, .data-table, .vt-form, .stack-form, .dash-grid) { margin-top: 10px; }
+
+/* ---- Cards ----------------------------------------------------------- */
+/* A card is a flat panel with corner brackets (an evidence frame) drawn by
+   its background, so no positioning changes for what is inside; the
+   brackets take the accent while the pointer is over it. */
+@property --brk { syntax: '<color>'; inherits: false; initial-value: transparent; }
+.card { --brk: color-mix(in srgb, var(--fg) 30%, transparent); background: var(--card); border: 1px solid var(--bd); border-radius: var(--r); padding: 16px; margin-bottom: 16px;
+  background-image: linear-gradient(var(--brk), var(--brk)), linear-gradient(var(--brk), var(--brk)), linear-gradient(var(--brk), var(--brk)), linear-gradient(var(--brk), var(--brk));
+  background-size: 10px 2px, 2px 10px, 10px 2px, 2px 10px; background-position: 0 0, 0 0, 100% 100%, 100% 100%; background-repeat: no-repeat;
+  transition: --brk .25s var(--ease), border-color .25s var(--ease), top .25s var(--ease), box-shadow .25s var(--ease); }
+/* Popups that are cards (a column's filter, a dropdown) keep their own
+   absolute position: never relative, never lifted. */
+.card:not(.sticky-bar, .col-filter, .dd-panel) { position: relative; top: 0; }
+/* A card under the pointer: accent frame, lifted a little. A card inside
+   another stays put (only the outer one lifts). By `top`, not a transform:
+   a transform would trap the fixed hover cards inside. */
+.card:hover { --brk: var(--acc); border-color: color-mix(in srgb, var(--acc) 30%, var(--bd)); }
+#app .card:not(.card .card, .sticky-bar, .full-window, .col-filter, .dd-panel):hover { top: -4px; box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--fg) 40%, transparent); }
+/* The panel the section navigator went to: its frame flashes once. */
+.card.nav-flash { animation: nav-flash 1.1s var(--ease); }
+@keyframes nav-flash { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 25% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 45%, transparent); } }
+.card.warn { border-left: 3px solid var(--med); }
+.card.bad { border-left: 3px solid var(--hi); }
+/* Card titles keep their capitals (they can hold names, which must read as
+   written); the chevron is the accent. */
+h2 { font-size: 14.5px; font-weight: 650; letter-spacing: .005em; margin: 0 0 12px; }
+h2 .chevron { color: var(--acc); }
+h2.collapsible, h2.card-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+h2.collapsible { cursor: pointer; user-select: none; transition: color var(--t); }
+h2.collapsible:hover { color: var(--acc); }
+.chevron { display: inline-block; transition: transform .2s var(--ease); font-size: 11px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.grid .card { margin: 0; }
+.kpi { display: flex; flex-direction: column; }
+.kpi .k { font-size: 11.5px; color: var(--mut); text-transform: uppercase; letter-spacing: .07em; }
+.kpi .v { font: 600 26px/1.2 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; margin-top: 4px; }
+.kpi .sub { font-size: 12px; color: var(--mut); margin-top: 2px; }
+.kpi-second { display: flex; flex-direction: column; margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--bd); }
+.kpi-second .v2 { font: 600 18px/1.3 var(--mono); font-variant-numeric: tabular-nums; }
+.kpi-foot { margin-top: auto; padding-top: 10px; }
+.kpi-note { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--bd); font-size: 12.5px; line-height: 1.5; }
+.kpi-noted { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+
+/* ---- Module badge (moduleBadge) --------------------------------------- */
+/* Which module generated a card's data: small, quiet, at the right of a
+   card's header (or the foot of a KPI card, the end of a summary strip). */
+.module-badge { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; padding: 1px 9px 1px 7px;
+  border: 1px solid var(--bd); border-radius: var(--r); font-size: 11px; font-weight: 500; color: var(--mut);
+  background: var(--raise); letter-spacing: .04em; text-transform: none; font-family: var(--mono); flex-wrap: wrap; row-gap: 2px; max-width: 100%; min-width: 0; }
+.module-badge a, .module-badge > span { white-space: nowrap; }
+.module-badge .icon svg { width: 12px; height: 12px; }
+.module-badge a { color: var(--mut); }
+.module-badge a:hover { color: var(--acc); }
+.module-badge .sep { opacity: .6; }
+.kpi-foot .module-badge { margin-left: 0; }
+
+/* ---- Narrative (narrative): what happened / why it matters / what next */
+.narrative { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; }
+.narrative-row { display: contents; }
+.narrative-label { font: 600 11px/1.6 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--mut); padding-top: 2px; }
+
+/* ---- Group cards (groupedView) ---------------------------------------- */
+.card.group { padding: 10px 14px; margin-bottom: 10px; background-color: var(--bg); }
+.card.group > h2 { margin: 0; font-weight: 400; font-size: 14px; }
+.card.group > div { margin-top: 10px; }
+.group-head { display: inline-flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.group-name { font-weight: 600; }
+
+/* ---- Triage (TRIAGE) and suppression ---------------------------------- */
+/* One hue per triage state, shared with no other tag in its column. */
+.tr-new { color: var(--acc); }
+.tr-reviewed { color: var(--st-ran); }
+.tr-benign { color: var(--ok); }
+.tr-escalated { color: var(--sev-critical); }
+.new-tag { margin-left: 8px; padding: 0 6px; border: 1px solid var(--acc); border-radius: var(--r); color: var(--acc); font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; vertical-align: 1px; }
+.shadow-tag { margin-left: 8px; padding: 0 6px; border: 1px solid var(--attn); border-radius: var(--r); color: var(--attn); font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; vertical-align: 1px; }
+.sig-shadow { border-left: 3px solid var(--attn); padding: 8px 12px; margin-bottom: 12px; }
+textarea.note, input.cond-value, input.cond-note { width: 100%; max-width: 720px; padding: 6px 10px; border: 1px solid var(--bd); border-radius: var(--r); background: var(--card); color: var(--fg); font: inherit; }
+textarea.note { resize: vertical; }
+.suppress-form { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--bd); border-radius: var(--r); background: var(--card); display: flex; flex-direction: column; gap: 8px; }
+.cond-row { display: grid; grid-template-columns: 18px 170px 110px minmax(0, 1fr); gap: 8px; align-items: center; max-width: 900px; }
+.cond-field { color: var(--mut); }
+.events-list .instance + .instance { margin-top: 8px; }
+.hidden-note { margin-top: 8px; }
+
+/* ---- Overview: the fleet dashboard ----------------------------------- */
+.dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap: 0 16px; }
+.dash-bars { display: flex; flex-direction: column; gap: 10px; }
+.card-intro { margin: 0 0 14px; font-size: 12.5px; line-height: 1.55; max-width: 1100px; }
+.freshness-range { margin-bottom: 12px; }
+.dash-bar-row { display: grid; grid-template-columns: minmax(180px, 1.3fr) 2fr 230px; gap: 12px; align-items: center; } /* a fixed last column: every row's bar starts and ends at the same place */
+.trend { display: flex; flex-direction: column; gap: 6px; }
+.trend-legend { display: flex; gap: 16px; font-size: 12px; color: var(--mut); }
+.trend-legend b { color: var(--fg); }
+.trend-legend .swatch, .trend-tip .swatch { display: inline-block; width: 10px; height: 10px; border-radius: var(--r); margin-right: 6px; vertical-align: -1px; }
+.trend-plot { position: relative; }
+.trend-plot svg { display: block; width: 100%; height: auto; }
+.trend-axis { font-size: 12px; fill: var(--mut); }
+.trend-grid { stroke: var(--bd); stroke-dasharray: 3 3; }
+.trend-base { stroke: var(--mut); stroke-opacity: .5; }
+.trend-day:hover path { filter: brightness(1.12); }
+.trend-tip { position: absolute; top: 0; transform: translateX(-50%); background: var(--card); border: 1px solid var(--bd); border-radius: var(--r);
+  padding: 6px 8px; font-size: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, .12); pointer-events: none; white-space: nowrap; z-index: 5; }
+.stack-bar { display: flex; height: 10px; border-radius: var(--r); overflow: hidden; background: var(--bd); }
+.stack-bar i { display: block; height: 100%; }
+.stack-bar .yes { background: var(--st-ran); }
+.stack-bar .no { background: var(--sev-high); }
+.stack-bar .unknown { background: color-mix(in srgb, var(--mut) 45%, transparent); }
+.stack-bar .fresh { background: var(--acc); }
+.stack-bar .rest { background: transparent; }
+
+/* ---- Hosts page ------------------------------------------------------- */
+.host-head .host-title { display: flex; gap: 10px; align-items: center; font-size: 20px; font-weight: 700; }
+.host-head .host-title .icon svg { width: 22px; height: 22px; }
+.host-head .host-role { font-size: 13px; font-weight: 500; }
+.host-head > * + * { margin-top: 6px; }
+.host-links { gap: 18px; }
+.user-note + .user-note { margin-top: 6px; }
+.facts-grid { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start; }
+.facts table td { white-space: normal; overflow-wrap: anywhere; }
+.facts table td:first-child { width: 150px; }
+.bar { height: 6px; background: var(--bd); border-radius: var(--r); overflow: hidden; margin-top: 8px; }
+.bar i { display: block; height: 100%; background: var(--acc); }
+
+/* ---- Filter bar (filterBar) and sticky pages (stickyPage) ------------ */
+/* The filter bar stays on screen, and every table header on the page
+   sticks just below it (--sticky-top is the bar's measured height). */
+.filters { display: flex; gap: 22px; flex-wrap: wrap; align-items: center; }
+.filters label { display: flex; gap: 8px; align-items: center; }
+/* The sticky bar lifts off the page once it sticks (a flat shadow, no blur). */
+.sticky-page .sticky-bar { position: sticky; top: 0; z-index: 30; box-shadow: 0 1px 0 var(--bd), 0 8px 0 -6px color-mix(in srgb, var(--bg) 80%, transparent); }
+
+/* ---- Summary strip (summaryStrip) ------------------------------------ */
+/* Readouts: each value a monospace figure, the items split by thin rules. */
+.summary-strip { display: flex; gap: 0; flex-wrap: wrap; align-items: center; row-gap: 10px; }
+.summary-item a { color: inherit; }
+.summary-item { display: flex; gap: 8px; align-items: center; padding: 0 22px; border-left: 1px solid var(--bd); }
+.summary-item:first-child { padding-left: 0; border-left: 0; }
+.summary-item .icon { color: var(--mut); }
+.summary-value { font: 700 19px/1.2 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.summary-item a:hover .summary-value { color: var(--acc); }
+
+/* ---- Controls -------------------------------------------------------- */
+input:is([type=search], [type=text], [type=date], [type=datetime-local]), select, textarea { padding: 6px 10px; border: 1px solid var(--bd); border-radius: var(--r); background: var(--bg); color: var(--fg); font: inherit; }
+:is(input, select, textarea) { transition: border-color var(--t), box-shadow var(--t), background var(--t); }
+:is(input, select, textarea):hover:not(:disabled) { border-color: color-mix(in srgb, var(--fg) 35%, var(--bd)); }
+:is(input, select, textarea):focus { outline: none; border-color: var(--acc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 18%, transparent); }
+input[type=checkbox], input[type=radio] { accent-color: var(--acc); }
+/* Buttons: flat, squared, a mechanical press. */
+button.btn { background: var(--acc); color: #fff; border: 1px solid var(--acc); border-radius: var(--r); padding: 6px 14px; cursor: pointer; font: inherit; font-weight: 600; letter-spacing: .01em;
+  transition: background var(--t), border-color var(--t), transform .08s; }
+button.btn:hover:not(:disabled) { background: color-mix(in srgb, var(--acc) 86%, var(--fg)); }
+button.ghost { background: none; color: var(--fg); border: 1px solid var(--bd); border-radius: var(--r); padding: 6px 12px; cursor: pointer; font: inherit;
+  transition: border-color var(--t), color var(--t), background var(--t), transform .08s; }
+button.ghost:hover:not(:disabled) { border-color: var(--acc); color: var(--acc); background: color-mix(in srgb, var(--acc) 6%, transparent); }
+:is(button.btn, button.ghost, .chip):active:not(:disabled) { transform: translateY(1px); }
+button.ghost.danger { color: var(--hi); border-color: color-mix(in srgb, var(--hi) 45%, var(--bd)); }
+button.ghost.danger:hover { color: var(--hi); border-color: var(--hi); background: color-mix(in srgb, var(--hi) 10%, transparent); }
+button.linklike { background: none; border: 0; padding: 0; color: var(--acc); cursor: pointer; font: inherit; }
+button.linklike:hover { text-decoration: underline; text-underline-offset: 3px; }
+.chip { border: 1px solid var(--bd); background: none; color: var(--fg); border-radius: var(--r); padding: 3px 12px; cursor: pointer; font: inherit; transition: border-color var(--t), background var(--t), color var(--t); }
+.chip:not(.on):hover { border-color: var(--acc); color: var(--acc); }
+.chip.on { background: var(--acc); color: #fff; border-color: var(--acc); }
+
+/* ---- Tables (dataTable) ---------------------------------------------- */
+/* A table grows with the page - never a fixed-height panel with its own
+   scrollbar - and pages its rows instead (see dataTable's pageSize). */
+/* Every table looks like the Rules page's: its rows on the page's
+   background, so only its borders and its header (the card's color) show -
+   wherever it sits. Cells wrap rather than widen the page: machine text
+   (paths, accounts, command lines) at its separators (dom.js mono), a
+   timestamp only between its date and time. */
+.tw { border: 1px solid var(--bd); border-radius: var(--r); background: var(--bg); }
+.toolbar { margin-bottom: 12px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: 8px 9px; border-bottom: 1px solid color-mix(in srgb, var(--bd) 70%, transparent); }
+th { white-space: nowrap; border-bottom: 1px solid var(--bd); }
+td { white-space: normal; overflow-wrap: anywhere; } /* a long unbroken value (a hash, a path) breaks rather than widening the table */
+.nw { white-space: nowrap; }
+th { cursor: pointer; font-size: 11.5px; font-weight: 600; letter-spacing: .04em; color: var(--mut); background: var(--raise); user-select: none; transition: color var(--t);
+  position: sticky; top: var(--sticky-top, 0px); z-index: 20; }
+th { overflow: hidden; text-overflow: ellipsis; }
+.col-grip { position: absolute; top: 0; right: 0; width: 6px; height: 100%; cursor: col-resize; }
+.col-grip:hover { background: color-mix(in srgb, var(--acc) 35%, transparent); }
+.detail th { position: static; } /* a table inside an expanded row does not stick */
+th:hover { color: var(--fg); }
+/* A row under the pointer: a tint and an accent tick at its left edge. */
+tbody tr { transition: background .12s; }
+tbody tr:hover { background: color-mix(in srgb, var(--acc) 7%, transparent); }
+tbody tr:hover > td:first-child { box-shadow: inset 2px 0 0 var(--acc); }
+/* A row with a severity (dataTable, a Severity column) is edged in its
+   color; under the pointer the edge widens rather than turning accent. */
+tr[class*="sev-row-"] > td:first-child { --edge: var(--mut); box-shadow: inset 3px 0 0 var(--edge); transition: box-shadow .12s; }
+tr.sev-row-critical > td:first-child { --edge: var(--sev-critical); } tr.sev-row-high > td:first-child { --edge: var(--sev-high); }
+tr.sev-row-medium > td:first-child { --edge: var(--sev-medium); } tr.sev-row-low > td:first-child { --edge: var(--sev-low); }
+tbody tr[class*="sev-row-"]:hover > td:first-child { box-shadow: inset 5px 0 0 var(--edge); }
+/* The row chosen with j / k (main.js setupKeys): framed in the accent, and
+   scrolled to clear the sticky bar and header. */
+tr.kbd-row { background: color-mix(in srgb, var(--acc) 10%, transparent); scroll-margin: calc(var(--sticky-top, 0px) + 44px) 0 24px; }
+.tw tbody tr.kbd-row > td { box-shadow: inset 0 1px 0 var(--acc), inset 0 -1px 0 var(--acc); }
+.tw tbody tr.kbd-row > td:first-child { box-shadow: inset 3px 0 0 var(--edge, var(--acc)), inset 0 1px 0 var(--acc), inset 0 -1px 0 var(--acc); }
+.tw tbody tr.kbd-row > td:last-child { box-shadow: inset -1px 0 0 var(--acc), inset 0 1px 0 var(--acc), inset 0 -1px 0 var(--acc); }
+/* The host page's compact header in the sticky bar (hosts.js), shown once the full one scrolls away. */
+.bar-host { display: none; margin-left: auto; align-items: center; gap: 10px; padding-left: 16px; border-left: 1px solid var(--bd); }
+.bar-host.on { display: inline-flex; animation: drop-in .18s var(--ease); }
+.bar-host b { font-weight: 650; }
+/* Placeholder rows while a server page is on its way (dataTable drawSkeleton). */
+.skeleton { display: block; height: 10px; width: 70%; border-radius: var(--r);
+  --sk: color-mix(in srgb, var(--fg) 9%, var(--card)); --sk-hi: color-mix(in srgb, var(--fg) 18%, var(--card));
+  background: linear-gradient(90deg, var(--sk) 0 35%, var(--sk-hi) 50%, var(--sk) 65%) 0 0 / 300% 100%;
+  animation: skeleton-sweep 1.2s linear infinite; }
+.skeleton-row:nth-child(even) .skeleton { width: 50%; }
+.skeleton-row > td { padding: 13px 9px; }
+tbody .skeleton-row:hover { background: none; }
+tbody .skeleton-row:hover > td:first-child { box-shadow: none; }
+@keyframes skeleton-sweep { from { background-position: 100% 0; } to { background-position: 0 0; } }
+/* An opened row's panel unfolds. */
+tr.detail-row > td > * { animation: drop-in .2s var(--ease) backwards; }
+table.expandable > tbody > tr:not(.detail-row) { cursor: pointer; }
+tr.focus-row { background: color-mix(in srgb, var(--acc) 12%, transparent); }
+tr.focus-row > td:first-child { box-shadow: inset 3px 0 0 var(--acc); }
+/* The detail row's cell must not inherit the nowrap above, or one long
+   sentence would stretch the whole table. */
+tr.detail-row td { white-space: normal; }
+/* A long-text column (a column's wrap option) wraps instead of widening
+   the whole table - including inside long unbroken tokens such as file
+   paths and command lines, which would otherwise widen the table past its
+   card's edge. */
+th.wrap, td.wrap { white-space: normal; min-width: 88px; }
+.pager { display: flex; gap: 6px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+.pager button[disabled] { opacity: .4; cursor: default; }
+.truncated-list { white-space: normal; }
+/* A cell holding several values (truncatedList): one per line. */
+.list-items { display: flex; flex-direction: column; gap: 2px; }
+.truncated-list .linklike { margin-top: 2px; }
+.entity { display: flex; flex-direction: column; gap: 2px; }
+.run-cell { display: inline-flex; gap: 12px; align-items: center; }
+
+/* ---- Icons and hover cards (svgIcon, withTip) ------------------------ */
+/* A hover card opens below its element (a column header's icon, a host
+   link); flipped to open leftward near the window's right edge. */
+.icon { display: inline-flex; vertical-align: middle; }
+.has-tip { position: relative; display: inline-flex; align-items: center; }
+.th-icon { cursor: help; }
+/* Fixed, placed by withTip: no scrolling frame or clipped header hides it. */
+.tip { display: none; position: fixed; z-index: 200; width: 260px; padding: 10px 12px;
+  background: var(--card); color: var(--fg); border: 1px solid var(--bd); border-top: 2px solid var(--acc); border-radius: var(--r); box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  white-space: normal; overflow-wrap: anywhere; overflow-y: auto; font-size: 12.5px; font-weight: 400; line-height: 1.45; text-transform: none; letter-spacing: 0; text-align: left; }
+.tip-wide > .tip { width: 380px; max-width: calc(100vw - 16px); }
+.tip > * { display: block; }
+.tip *, .tw td .tip, .tw td .tip * { white-space: normal; }
+.tip b { margin-bottom: 3px; }
+.has-tip:hover > .tip { display: block; animation: drop-in .14s var(--ease); }
+.dd-panel, .col-filter { animation: drop-in .14s var(--ease); }
+
+/* ---- Colored-text tags ----------------------------------------------- */
+/* No background: the color is carried by the text. */
+.tagtext { font-weight: 600; font-size: 12.5px; white-space: nowrap; }
+.tagtext.tag-wraps { white-space: normal; } /* a tag that is a phrase (a note), not a word */
+.sev-critical { color: var(--sev-critical); }
+.sev-high { color: var(--sev-high); }
+.sev-medium { color: var(--sev-medium); }
+.sev-low { color: var(--sev-low); }
+.st-flagged { color: var(--st-flagged); }
+.st-ran { color: var(--st-ran); }
+.st-notrun { color: var(--st-notrun); }
+.origin-imported { color: var(--origin-imported); }
+/* A one-host yes/no value (table.js mark): a check or a cross, colored. */
+.mark { display: inline-flex; vertical-align: middle; }
+.mark-yes { color: var(--st-ran); }
+.mark-no { color: var(--sev-high); }
+/* SecurityLog event statuses (EVENT_STATUS) - one hue each. */
+.ev-ok { color: var(--st-ran); }
+.ev-absent_common { color: var(--sev-high); }
+.ev-absent { color: var(--sev-medium); }
+.ev-present_policy_off { color: var(--ev-policy-off); }
+.ev-unmapped { color: var(--mut); }
+.ev-policy_unknown { color: var(--st-notrun); }
+.ev-not_read { color: var(--sev-low); }
+.ev-condition_occurred { color: var(--acc); }
+.ev-condition_not_seen { color: var(--mut); font-style: italic; }
+.tag { display: inline-block; background: var(--bd); border-radius: var(--r); padding: 1px 6px; font-size: 11px; margin-right: 4px; }
+.result-ok { color: var(--ok); } .result-err { color: var(--hi); }
+
+/* ---- Detail panels (detailBlock, codeBlock) -------------------------- */
+.detail { padding: 14px 16px; background: var(--bg); border-top: 1px solid var(--bd); }
+.detail-block + .detail-block { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--bd); }
+.detail-block > * + * { margin-top: 8px; }
+/* Section labels: monospace capitals behind a small accent square. */
+.detail-title, .sig-section { font: 600 11px/1.6 var(--mono); text-transform: uppercase; letter-spacing: .09em; color: var(--mut); }
+.detail-title::before, .sig-section::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 8px; background: var(--acc); vertical-align: 1px; }
+.kv { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; }
+.kv span { color: var(--mut); }
+.instance { background: var(--card); border: 1px solid var(--bd); border-radius: var(--r); padding: 10px 12px; }
+.enrichment { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--bd); font-size: 12.5px; }
+.ph { font-style: italic; color: var(--mut); border-bottom: 1px dashed var(--mut); }
+.ph-val { font-weight: 700; color: var(--acc); }
+.code-block { margin: 0; padding: 12px 16px; background: var(--code-bg); border: 1px solid var(--code-bd); border-radius: var(--r);
+  color: var(--code-fg); font: 12.5px/1.6 var(--mono); white-space: pre-wrap; overflow-x: auto; }
+.cb-comment { color: var(--code-comment); font-style: italic; }
+.cb-sel { color: var(--code-sel); }
+.cb-field { color: var(--code-field); }
+.cb-mod { color: var(--code-mod); }
+.cb-val { color: var(--code-val); }
+.cb-kw { color: var(--code-kw); }
+.cb-expr { color: var(--code-fg); font-weight: 600; }
+
+.triage-history { font-size: 12px; }
+
+/* ---- Sign-in and the signed-in account ------------------------------ */
+body.signed-out #tabs, body.signed-out #navToggle, body.signed-out #headerStats, body.signed-out #headerAbout { visibility: hidden; }
+.user-box { display: inline-flex; gap: 10px; align-items: center; }
+.login-card { max-width: 380px; margin: 12vh auto 60px; padding: 26px 26px 22px; display: grid; gap: 14px; border-top: 2px solid var(--acc); }
+.login-card h2 { text-align: center; color: var(--mut); font-size: 13px; font-weight: 500; }
+.login-card .btn { padding: 9px 14px; }
+.login-brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px; }
+.login-brand .brand-mark { width: 44px; height: 44px; }
+.login-brand .brand-word { width: 136px; height: 22px; }
+.login-card label { display: grid; gap: 6px; }
+.login-card input { padding: 8px 10px; border: 1px solid var(--bd); border-radius: var(--r); background: var(--bg); color: var(--fg); font: inherit; }
+.login-note { font-size: 12px; }
+
+/* ---- Hosts page: telemetry ------------------------------------------- */
+
+/* ---- Rules page: group by ATT&CK tactic ------------------------------ */
+.tactic-head { display: inline-flex; gap: 16px; align-items: center; flex-wrap: wrap; font-weight: 400; }
+.tactic-name { font-weight: 600; min-width: 170px; }
+.tactic-cov { display: inline-flex; gap: 8px; align-items: center; }
+.tactic-cov .bar { width: 120px; margin: 0; }
+
+/* ---- Fleet inventory pages ------------------------------------------- */
+.tab-bar { margin-bottom: 12px; }
+.tab-bar-sub { gap: 6px; padding-bottom: 10px; border-bottom: 1px solid var(--bd); }
+.tab-bar-sub .chip { padding: 2px 10px; font-size: 12.5px; border-radius: var(--r); }
+.source-line { display: flex; margin-bottom: 10px; }
+.source-line .module-badge { margin-left: 0; }
+.view-filters { gap: 20px; margin-bottom: 12px; }
+.view-filters label { display: flex; gap: 8px; align-items: center; }
+.toggle { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+
+/* ---- Import page ----------------------------------------------------- */
+.dropzone { border: 1px dashed color-mix(in srgb, var(--fg) 30%, var(--bd)); border-radius: var(--r); padding: 40px; text-align: center; color: var(--mut); transition: border-color var(--t), color var(--t), background var(--t); }
+.dropzone:hover { border-color: var(--acc); }
+.dropzone.over { border-style: solid; border-color: var(--acc); color: var(--acc); background: color-mix(in srgb, var(--acc) 6%, transparent); }
+.import-result { margin-top: 10px; }
+
+/* ---- Scrollbars ------------------------------------------------------ */
+/* Plain CSS, not a library: Firefox's scrollbar-color/scrollbar-width and
+   the WebKit/Blink pseudo-elements cover every browser this app is likely
+   to run in, with no external dependency. */
+html { scrollbar-width: thin; scrollbar-color: var(--bd) var(--bg); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bd); border-radius: var(--r); border: 2px solid var(--bg); background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--acc); }
+::-webkit-scrollbar-corner { background: var(--bg); }
+
+/* A module's KPIs: one card of rows; values colored by status. */
+/* A host's module KPI cards: each as tall as its content, packed in columns (masonry). */
+.kpi-modules { display: block; columns: 340px; column-gap: 12px; }
+.grid.kpi-modules > .card { break-inside: avoid; margin: 0 0 12px; display: inline-block; width: 100%; }
+.kpi-v { display: inline-block; font-weight: 600; font-size: 1.05em; font-variant-numeric: tabular-nums; }
+.kpi-good { color: var(--ok); }
+.kpi-warn { color: var(--attn); }
+.kpi-bad { color: var(--hi); }
+.kpi-note-row td { padding-top: 0; }
+.kpi-note { font-size: .88em; line-height: 1.45; padding: 6px 10px; border-left: 3px solid currentColor; background: var(--bg2, rgba(127,127,127,.08)); border-radius: var(--r); }
+.kpi-note.kpi-warn, .kpi-note.kpi-bad { color: inherit; border-left-color: var(--attn); }
+.kpi-note.kpi-bad { border-left-color: var(--hi); }
+
+/* The signal table: a long entity (a command line) reads as two lines, whole on hover and in the expanded signal. */
+.entity-clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; max-width: 64ch; }
+
+/* The expanded signal, read like an alert. */
+.sig-detail { padding: 0; }
+.sig-head { display: grid; gap: 4px; padding: 14px 18px; border-left: 5px solid var(--mut); background: var(--card); border-bottom: 1px solid var(--bd); }
+.sig-head.sev-critical { border-left-color: var(--sev-critical); } .sig-head.sev-high { border-left-color: var(--sev-high); }
+.sig-head.sev-medium { border-left-color: var(--sev-medium); } .sig-head.sev-low { border-left-color: var(--sev-low); }
+.sig-head > .tagtext { font-weight: 700; text-transform: uppercase; letter-spacing: .05em; font-size: 12px; }
+.sig-head-title { font-size: 16px; font-weight: 650; color: var(--fg); }
+.sig-head-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--mut); align-items: center; }
+.sig-body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; padding: 16px 18px; }
+@media (max-width: 1100px) { .sig-body { grid-template-columns: minmax(0, 1fr); } }
+.sig-section { margin: 4px 0 8px; }
+.sig-detail > .sig-section { padding: 0 18px; }
+.sig-detail > .detail-block { padding: 14px 18px; border-top: 1px solid var(--bd); margin-top: 0; }
+.sig-fact-k svg, .sig-side-title svg { width: 14px; height: 14px; }
+.sig-facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 10px 0; }
+.sig-fact { background: var(--card); border: 1px solid var(--bd); border-radius: var(--r); padding: 8px 10px; min-width: 0; }
+.sig-fact.wide { grid-column: 1 / -1; }
+.sig-fact-k { display: flex; gap: 6px; align-items: center; font-size: 11.5px; color: var(--mut); margin-bottom: 4px; }
+.sig-fact-v { overflow-wrap: anywhere; font-weight: 550; }
+pre.sig-code { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 260px; overflow: auto; background: var(--code-bg); color: var(--code-fg); border: 1px solid var(--code-bd); padding: 10px 12px; border-radius: var(--r); font-size: 12.5px; line-height: 1.5; }
+.sig-attn { color: var(--attn); } .sig-bad { color: var(--hi); }
+.sig-chain { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.sig-node { border: 1px solid var(--bd); background: var(--card); border-radius: var(--r); padding: 6px 12px; min-width: 120px; }
+.sig-node.hot { border-color: var(--attn); box-shadow: 0 0 0 1px var(--attn) inset; }
+.sig-node-k { font-size: 11px; color: var(--mut); }
+.sig-arrow { font-size: 20px; color: var(--mut); }
+.sig-timeline { margin: 12px 0; }
+.sig-tl-bar { position: relative; height: 4px; background: var(--acc); border-radius: var(--r); margin: 0 6px; }
+.sig-tl-bar.range { background: repeating-linear-gradient(90deg, var(--attn) 0 8px, transparent 8px 14px); }
+.sig-tl-bar i { position: absolute; top: -4px; width: 12px; height: 12px; border-radius: 50%; background: var(--acc); }
+.sig-tl-bar i:first-child { left: -6px; } .sig-tl-bar i:last-child { right: -6px; }
+.sig-tl-ends { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--mut); margin-top: 8px; }
+.sig-variants { margin: 12px 0; display: grid; gap: 4px; }
+/* The occurrence timeline: a lane per signal, a mark per occurrence (components.js occurrenceTimeline) -
+   lanes striped on a quiet panel, quarter lines across the tracks, marks ringed in the panel's colour. */
+.tl { display: grid; gap: 2px; margin: 4px 0; padding: 10px 12px 6px; background: var(--raise); border: 1px solid var(--bd); border-radius: var(--r); }
+.tl-lane { display: grid; grid-template-columns: minmax(140px, 30%) minmax(0, 1fr); gap: 12px; align-items: center; padding: 3px 4px; border-radius: var(--r); transition: background var(--t); }
+.tl-lane:nth-child(even) { background: color-mix(in srgb, var(--fg) 3%, transparent); }
+.tl-lane:hover { background: color-mix(in srgb, var(--acc) 8%, transparent); }
+.tl-label { display: flex; align-items: center; gap: 7px; font-size: 12.5px; min-width: 0; overflow-wrap: anywhere; }
+.tl-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.tl-track { position: relative; height: 22px; margin: 0 8px;
+  background: linear-gradient(var(--bd), var(--bd)) 0 50% / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--bd) 70%, transparent) 0 1px, transparent 1px 25%); }
+.tl-mark { position: absolute; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: currentColor; opacity: .9;
+  box-shadow: 0 0 0 2px var(--raise); transition: transform var(--t), opacity var(--t); }
+.tl-mark:hover { transform: scale(1.6); opacity: 1; z-index: 1; }
+.tl-mark.tl-range { margin: -3px 0 0; height: 6px; border-radius: 3px; opacity: .6; box-shadow: none; }
+.tl-mark.tl-range:hover { transform: scaleY(1.6); }
+.tl-mark.tl-bin { margin: 0; top: auto; bottom: 1px; width: auto; border-radius: 1px; opacity: .75; box-shadow: none; }
+.tl-faded { opacity: .45; }
+.tl-axis { position: relative; height: 18px; margin: 4px 8px 0 calc(30% + 20px); font: 11px var(--mono); color: var(--mut); }
+.tl-tick { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.tl-tick:first-child { transform: none; } .tl-tick:last-child:not(:first-child) { transform: translateX(-100%); }
+.tl-axis.one .tl-tick { left: 50% !important; transform: translateX(-50%); }
+.entity-link svg { width: 13px; height: 13px; margin-right: 4px; vertical-align: -2px; }
+.ent-head-type { text-transform: uppercase; letter-spacing: .05em; font-size: 11.5px; color: var(--mut); }
+/* An entity's page: every signal about it unfolding in place (signals.js signalSection). */
+.ent-sigs { display: grid; gap: 8px; margin-top: 14px; }
+.ent-sigs-head { display: flex; align-items: center; gap: 8px; }
+.ent-sigs-head .detail-title { margin: 0 auto 0 0; }
+.ent-sig { border: 1px solid var(--bd); border-left: 4px solid var(--bd); border-radius: var(--r); background: var(--card); min-width: 0; }
+.ent-sig.sev-edge-critical { border-left-color: var(--sev-critical); } .ent-sig.sev-edge-high { border-left-color: var(--sev-high); }
+.ent-sig.sev-edge-medium { border-left-color: var(--sev-medium); } .ent-sig.sev-edge-low { border-left-color: var(--sev-low); }
+/* A folded signal is one row, its columns aligned with the rows around it: severity, title with what it
+   matched, rule, matches, when, triage (signals.js signalSection, timelineSection). */
+.ent-sig-head { display: grid; grid-template-columns: 12px 64px minmax(0, 1fr) minmax(170px, 250px) 74px; align-items: center; gap: 6px 12px;
+  padding: 9px 12px; cursor: pointer; font-size: 13px; }
+.ent-sig-head:focus-visible { outline: 2px solid var(--acc); outline-offset: -2px; }
+.ent-sig-main { min-width: 0; display: grid; gap: 2px; }
+.ent-sig-main .new-tag, .ent-sig-main .shadow-tag, .ent-sig-main .approved-tag { margin-left: 8px; }
+.approved-tag { margin-left: 8px; padding: 0 6px; border: 1px solid var(--approved); border-radius: var(--r); color: var(--approved); font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; vertical-align: 1px; }
+.ent-sig-what { font-size: 11.5px; color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ent-sig-rule { font-size: 11.5px; overflow-wrap: anywhere; }
+.ent-sig-n, .ent-sig-when { font-size: 12px; }
+.ent-sig-tri { justify-self: end; }
+/* rule, matches and when share one column, the rule above the rest */
+.ent-sig-meta { display: flex; flex-wrap: wrap; gap: 0 10px; min-width: 0; }
+.ent-sig-meta .ent-sig-rule { flex-basis: 100%; }
+@media (max-width: 1280px) {
+  .ent-sig-head { grid-template-columns: 12px 64px minmax(0, 1fr) auto; }
+  .ent-sig-meta { display: flex; flex-wrap: wrap; gap: 2px 14px; grid-column: 3; }
+  .ent-sig-tri { grid-column: 4; grid-row: 1; }
+}
+/* The signals' time rail (signals.js signalsBlock): oldest first, each signal's start beside it on a
+   line through severity-coloured dots, the time that passed between two on the line. */
+.ent-sigs-order { margin-right: auto; font-family: var(--mono); }
+.ent-sigs-head .detail-title { margin-right: 10px; }
+.ent-rail { position: relative; display: grid; gap: 4px; }
+.ent-rail::before { content: ''; position: absolute; top: 18px; bottom: 18px; left: 115px; width: 2px; background: linear-gradient(var(--acc), color-mix(in srgb, var(--acc) 35%, var(--bd))); border-radius: 1px; }
+.ent-step { display: grid; grid-template-columns: 104px 24px minmax(0, 1fr); align-items: start; }
+.ent-step-when { text-align: right; padding: 9px 4px 0 0; font-family: var(--mono); line-height: 1.25; }
+.ent-step-date { font-size: 11px; color: var(--mut); }
+.ent-step-time { font-size: 13px; font-weight: 650; color: var(--fg); }
+.ent-step-when.ranged .ent-step-time { color: var(--attn); font-weight: 500; }
+.ent-step-dot { position: relative; z-index: 1; justify-self: center; width: 12px; height: 12px; margin-top: 16px; border-radius: 50%;
+  background: currentColor; box-shadow: 0 0 0 3px var(--card), 0 0 0 4px currentColor; }
+.ent-step-gap { padding-left: 128px; font: 11px var(--mono); color: var(--mut); }
+.ent-step-gap span { padding: 1px 6px; border: 1px dashed var(--bd); border-radius: 10px; background: var(--card); }
+/* Gap sizes: at the same time tight; under a day n; days n+3 and months n+6 steps (of 8px). */
+.ent-step-gap { display: flex; gap: 6px; align-items: center; }
+.ent-step-gap.gap-same { margin: -3px 0; } .ent-step-gap.gap-same span { border-style: dotted; }
+.ent-step-gap.gap-days { margin: 24px 0; } .ent-step-gap.gap-months { margin: 48px 0; }
+.ent-step-gap span.gap-rough { border: 1px solid color-mix(in srgb, var(--acc) 50%, var(--bd)); color: var(--acc); font-weight: 600; }
+@media (max-width: 700px) {
+  .ent-step { grid-template-columns: 78px 20px minmax(0, 1fr); } .ent-rail::before { left: 87px; } .ent-step-gap { padding-left: 98px; }
+}
+/* The entity's signals at a glance, under its header (signals.js glance). */
+.ent-glance { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 18px 0; }
+.ent-glance-item { min-width: 110px; padding: 8px 12px; background: var(--raise); border: 1px solid var(--bd); border-radius: var(--r); }
+.ent-glance-item.attn { border-color: var(--attn); } .ent-glance-item.bad { border-color: var(--sev-high); }
+.ent-glance-item.bad .ent-glance-v { color: var(--sev-high); }
+.ent-glance-v { font: 600 14px var(--mono); overflow-wrap: anywhere; }
+.ent-glance-k { font-size: 11px; color: var(--mut); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+/* The entity's triage: below everything, the page's width. */
+/* The entity's graph: the page's width, above its signals and the side column. */
+.ent-graph-wide { padding: 14px 18px 0; }
+.ent-graph-wide > .card { margin: 0; }
+.sig-body > .ent-side { margin-top: 14px; } /* level with the signals' heading (.ent-sigs) */
+.ent-triage-wide { padding: 0 18px 18px; }
+.ent-triage-wide .detail-block { margin: 0; padding: 14px 16px; border: 1px solid var(--bd); border-radius: var(--r); background: var(--raise); }
+.ent-triage-wide .note { max-width: none; }
+.ent-sig-head { transition: background var(--t); }
+.ent-sig-head:hover { background: color-mix(in srgb, var(--acc) 6%, transparent); }
+.ent-sig-body { animation: drop-in .2s var(--ease) backwards; }
+.ent-sig-head .chevron { display: inline-block; transition: transform .15s; }
+.title-var { font-style: italic; font-weight: 600; color: var(--acc); } /* a value a signal's title names (quotedTitle) */
+.ent-sig-title { font-weight: 650; overflow-wrap: anywhere; } /* a hash or path in a title breaks where it must */
+.ent-sig.open .ent-sig-head { border-bottom: 1px solid var(--bd); }
+.ent-sig-body { display: grid; gap: 12px; padding: 12px 14px 14px; min-width: 0; }
+.ent-sig-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.ent-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; }
+.ent-side .detail-block { margin: 0; }
+.ent-related { font-size: 12.5px; }
+.ent-related summary { cursor: pointer; }
+.ent-related .sig-side-card { margin-top: 6px; }
+.ent-rules { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.ent-rule { white-space: nowrap; } .ent-rule.closed { opacity: .5; }
+
+.sig-all { margin-top: 12px; }
+.sig-all summary { cursor: pointer; color: var(--acc); font-size: 12.5px; }
+.sig-all .kv { margin-top: 8px; }
+.sig-side { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.sig-side-card, .sig-side-card * { overflow-wrap: anywhere; word-break: break-word; }
+.sig-side-row > * { min-width: 0; }
+.sig-side-card { background: var(--card); border: 1px solid var(--bd); border-radius: var(--r); padding: 10px 12px; display: grid; gap: 7px; min-width: 0; }
+.sig-side-title { display: flex; gap: 6px; align-items: center; font-weight: 650; font-size: 12.5px; }
+.sig-side-row { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 8px; font-size: 12.5px; overflow-wrap: anywhere; }
+.sig-small { font-size: 12px; line-height: 1.45; }
+.sig-pill { display: inline-block; padding: 1px 8px; border-radius: var(--r); font-size: 11.5px; font-weight: 650; border: 1px solid currentColor; }
+.sig-pill.ok { color: var(--ok); } .sig-pill.bad { color: var(--hi); } .sig-pill.attn { color: var(--attn); } .sig-pill.neutral { color: var(--mut); }
+.sig-page { padding: 0; overflow: hidden; }
+
+/* A signal's page: its sources, its process graph, its details table. */
+.sig-sources { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.sig-source { background: var(--card); border: 1px solid var(--bd); border-radius: var(--r); padding: 10px 12px; display: grid; gap: 5px; min-width: 0; }
+.sig-source.main { border-left: 3px solid var(--acc); }
+.sig-source-k { display: flex; gap: 6px; align-items: center; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--mut); }
+.sig-source-k svg { width: 14px; height: 14px; }
+.sig-source-v { font-weight: 600; }
+.sig-graph { display: flex; align-items: stretch; gap: 0; margin: 4px 0 18px; flex-wrap: wrap; }
+.sig-graph .sig-node { flex: 1 1 260px; max-width: 380px; border: 1px solid var(--bd); border-radius: var(--r); padding: 14px 16px; background: var(--card); display: grid; gap: 6px; }
+.sig-graph .sig-node.hot { border: 2px solid var(--attn); box-shadow: 0 0 0 4px color-mix(in srgb, var(--attn) 15%, transparent); }
+.sig-node-role { display: flex; gap: 6px; align-items: center; font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--mut); }
+.sig-node-role svg, .sig-node-meta svg { width: 14px; height: 14px; }
+.sig-node-name { font-size: 17px; font-weight: 700; }
+.sig-node-path { font-size: 11.5px; color: var(--mut); overflow-wrap: anywhere; }
+.sig-node-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; align-items: center; }
+.sig-node-meta span { display: inline-flex; gap: 5px; align-items: center; }
+.sig-edge { flex: 0 0 110px; align-self: center; position: relative; height: 2px; background: var(--attn); margin: 0 6px; }
+.sig-edge::after { content: ''; position: absolute; right: -2px; top: -5px; border: 6px solid transparent; border-left: 9px solid var(--attn); }
+.sig-edge span { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 11.5px; color: var(--mut); white-space: nowrap; }
+.sig-table { margin: 12px 0; padding: 4px 0; }
+.sig-table td:first-child { width: 180px; }
+.sig-detail .sig-fact.wide { margin-bottom: 10px; }
+
+/* Column filters (dataTable): a quiet funnel in each header, accented when
+   the column is filtered, and its panel under the header. */
+.data-table { position: relative; }
+.th-filter { background: none; border: 0; padding: 0 2px; margin-left: 3px; cursor: pointer; color: var(--mut); opacity: .45; vertical-align: middle; }
+.th-filter:hover { opacity: 1; }
+.th-filter.on { opacity: 1; color: var(--acc); }
+.th-filter svg { width: 12px; height: 12px; }
+/* A column's filter menu resizes from its bottom-right corner, like a
+   spreadsheet's; once resized (the browser sets its size inline), the
+   values list takes the room. */
+/* A checkbox dropdown's list: as tall as the window allows below it
+   (fitToWindow sets --fit), scrolling past that. */
+.dd-panel { position: absolute; z-index: 20; padding: 10px; margin-top: 4px; min-width: 200px; max-height: var(--fit, 60vh); overflow-y: auto; }
+.col-filter { position: absolute; z-index: 30; width: 300px; min-width: 240px; min-height: 180px; max-width: 90vw; max-height: min(85vh, var(--fit, 85vh)); padding: 10px;
+  display: flex; flex-direction: column; gap: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.25); resize: both; overflow: hidden; }
+.col-filter > * { flex: none; }
+.col-filter > .col-filter-values { flex: 1 1 auto; min-height: 60px; }
+.col-filter[style*="height"] > .col-filter-values { max-height: none; }
+.col-filter-title { font-weight: 650; }
+.col-filter .row { gap: 6px; flex-wrap: nowrap; }
+.col-filter .row input[type=text] { flex: 1; min-width: 0; }
+.col-filter-values { max-height: 240px; overflow: auto; display: grid; gap: 2px; border: 1px solid var(--bd); border-radius: var(--r); padding: 6px; }
+.col-filter-values label { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; cursor: pointer; font-size: 12.5px; }
+.col-filter-text { overflow-wrap: anywhere; }
+
+/* An autorun's flag: red when flagged, faint when not. */
+.flag-btn { background: none; border: 0; padding: 0; cursor: pointer; }
+.flag-on { color: var(--hi); }
+.flag-off { color: var(--mut); opacity: .35; }
+.flag-on svg, .flag-off svg { width: 16px; height: 16px; }
+.flag-on svg { fill: var(--hi); }
+
+/* Tables keep each value on one line; a data table scrolls in its own
+   frame, its header fixed at the frame's top. A card's small fact table and
+   an expanded row's panel wrap. A column the user resized cuts what does
+   not fit with an ellipsis rather than spilling into the next column. */
+.tw { overflow: auto; max-height: calc(100vh - var(--sticky-top, 0px) - 140px); }
+.tw th { top: 0; }
+.detail .tw, .tw.tw-auto { max-height: none; } /* auto-height: the table grows with its rows (dataTable opts.height) */
+.tw td, .tw td * { white-space: nowrap; overflow-wrap: normal; }
+.tw tr.detail-row td, .tw tr.detail-row td *:not(pre) { white-space: normal; overflow-wrap: anywhere; }
+/* A long-text column (a description, a title, a reason) wraps at a
+   readable measure - about 60 characters a line - so the table stays
+   narrow; machine text breaks only where it must. */
+.tw td.wrap, .tw td.wrap *:not(pre) { white-space: normal; overflow-wrap: anywhere; }
+.tw td.wrap { min-width: 280px; max-width: 460px; }
+.tw table[style*="fixed"] > tbody > tr:not(.detail-row) > td { overflow: hidden; text-overflow: ellipsis; }
+
+
+/* The Graph page (pages/graph.js): the graph fills the content area below
+   the top bar and the host-filter bar; its own ⤢/⛶ still cover everything. */
+.graph-page { padding: 10px 0 0; }
+.graph-page .ent-graph-frame { height: calc(100vh - var(--sticky-top, 120px) - 28px); margin: 0; }
+.graph-page .ent-graph-frame:not(.full-window) .ent-graph { height: 100%; }
+
+/* The entity graph (graph.js): quiet lines, legible labels, glass controls. */
+.ent-graph { width: 100%; height: auto; display: block; cursor: move; touch-action: none; }
+/* The graph lies on an evidence board: a flat surface with a dot grid. */
+.ent-graph-frame { position: relative; overflow: hidden; border: 1px solid var(--bd); border-radius: var(--r); margin: 6px 0;
+  background: var(--bg) radial-gradient(circle, color-mix(in srgb, var(--fg) 14%, transparent) 1px, transparent 1.5px) 0 0 / 22px 22px; }
+.ent-graph-frame:fullscreen, .ent-graph-frame.full-window { display: flex; align-items: center; }
+.ent-graph-frame.full-window, .matrix-wrap.full-window { position: fixed; inset: 0; z-index: 1000; margin: 0; border-radius: 0; }
+.ent-graph-frame:fullscreen .ent-graph, .ent-graph-frame.full-window .ent-graph { height: 100%; }
+/* Controls and cards: frosted glass over the graph. */
+.ent-graph-zoom { position: absolute; top: 8px; right: 8px; left: 8px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; align-items: center; z-index: 1; pointer-events: none; }
+.ent-graph-zoom > * { pointer-events: auto; }
+.ent-graph-zoom button, .ent-graph-search { background: color-mix(in srgb, var(--card) 85%, transparent); backdrop-filter: blur(6px); }
+.ent-graph-card { background: color-mix(in srgb, var(--card) 96%, transparent); backdrop-filter: blur(8px); }
+.ent-graph-zoom button { min-width: 30px; border-radius: var(--r); transition: border-color 0.15s ease, color 0.15s ease; }
+.ent-graph-zoom button:hover { border-color: var(--acc); color: var(--acc); }
+.ent-graph-search { width: 170px; border-radius: var(--r); }
+.ent-graph-cards { position: absolute; top: calc(var(--bar-h, 34px) + 16px); right: 8px; bottom: 8px; width: min(320px, 45%); overflow-y: auto; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.ent-graph-cards[hidden] { display: none; }
+/* Options hidden (graph.js bare): the entities alone, but for filling the window and full screen. */
+.ent-graph-frame.bare .ent-graph-zoom > :not(.big-mode) { display: none; }
+.ent-graph-frame.bare .ent-graph-cards { top: 52px; }
+.ent-graph-frame .ent-graph-bare-toggle { position: absolute; right: 10px; bottom: 10px; z-index: 2; width: 32px; height: 32px; min-width: 0; padding: 0; border-radius: 50%;
+  display: grid; place-items: center; background: color-mix(in srgb, var(--card) 85%, transparent); backdrop-filter: blur(6px); }
+.ent-graph-bare-toggle:hover { border-color: var(--acc); color: var(--acc); }
+.ent-graph-bare-toggle .icon { display: flex; align-items: center; justify-content: center; line-height: 0; }
+.ent-graph-bare-toggle svg { width: 15px; height: 15px; display: block; }
+.ent-graph-card { pointer-events: auto; border: 1px solid var(--bd); border-radius: var(--r); padding: 10px 12px; display: flex; flex-direction: column; gap: 5px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22); }
+.ent-graph-links { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+.ent-graph-chosen { display: flex; gap: 4px; }
+.ent-graph-chosen button:first-child { flex: 1; }
+.ent-graph-frame button.ghost.on { background: var(--acc); border-color: var(--acc); color: #fff; }
+/* Nothing in a card runs past its edge: long names, paths and tags wrap. */
+.ent-graph-card, .ent-graph-card * { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+.ent-graph-card button { text-align: left; display: flex; align-items: flex-start; gap: 6px; padding: 4px 8px; border-radius: var(--r); transition: border-color 0.15s ease, background 0.15s ease; }
+.ent-graph-card button:hover { border-color: var(--acc); background: color-mix(in srgb, var(--acc) 8%, transparent); }
+.ent-graph-card button .icon { flex: none; }
+/* Lines: quiet until lit; lit ones take the accent. */
+.ent-graph-edge { stroke: color-mix(in srgb, var(--mut) 35%, transparent); stroke-width: var(--w, 1); stroke-linecap: round; }
+.ent-graph.focus .ent-graph-edge.lit { stroke: var(--acc); stroke-width: calc(var(--w, 1) + .6px); stroke-dasharray: 7 4; animation: edge-flow 1.2s linear infinite; }
+.ent-graph-why { display: none; font-size: 9px; fill: var(--fg); text-anchor: middle; paint-order: stroke; stroke: var(--card); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.ent-graph.focus .ent-graph-why.lit { display: inline; }
+.ent-graph-why .ent-graph-rules { font-size: 8px; fill: var(--mut); }
+/* Nodes: an icon, a halo-backed label that stays legible over lines. */
+.ent-graph-node { cursor: grab; touch-action: none; }
+.ent-graph-node text { font-size: 10px; fill: color-mix(in srgb, var(--fg) 85%, var(--mut)); paint-order: stroke; stroke: var(--card); stroke-width: 3px; stroke-linejoin: round; }
+.ent-graph-node text.opt { display: none; }
+.ent-graph-node.sel text, .ent-graph.focus .ent-graph-node.lit text { fill: var(--fg); }
+.ent-graph-node.sel text { font-weight: 600; }
+.ent-graph-node.faded { opacity: 0.45; }
+.ent-graph-hit { fill: transparent; stroke: none; }
+.ent-graph-icon { fill-opacity: 0.28; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; overflow: visible;
+  transform-box: fill-box; transform-origin: center; transition: transform 0.18s ease; }
+.ent-graph-node:hover .ent-graph-icon, .ent-graph-node.sel .ent-graph-icon { transform: scale(1.12); }
+.ent-graph-ring { fill: none; stroke: color-mix(in srgb, var(--fg) 60%, transparent); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.ent-graph.focus .ent-graph-node:not(.lit), .ent-graph.focus .ent-graph-edge:not(.lit) { opacity: 0.1; }
+.ent-graph.focus .ent-graph-node.lit text.opt { display: inline; }
+.ent-graph.searching .ent-graph-node:not(.match), .ent-graph.searching .ent-graph-edge { opacity: 0.12; }
+.ent-graph.searching .ent-graph-node.match text.opt { display: inline; }
+.ent-graph.searching .ent-graph-node.match .ent-graph-hit { stroke: var(--acc); stroke-width: 2; }
+/* A little life: nodes and lines fade in, dimming eases, critical entities pulse softly, cards slide in. */
+.ent-graph-node { animation: ent-graph-in 0.6s ease-out backwards; }
+.ent-graph-edge { animation: ent-graph-in 0.9s ease-out backwards; }
+.ent-graph-node, .ent-graph-edge { transition: opacity 0.3s ease, stroke 0.3s ease; }
+.ent-graph-node.urgent .ent-graph-hit { stroke: var(--sev-critical); animation: ent-graph-pulse 2.4s ease-in-out infinite; }
+.ent-graph-card { animation: ent-graph-card-in 0.22s ease-out both; }
+@keyframes ent-graph-in { from { opacity: 0; } }
+@keyframes ent-graph-pulse { 0%, 100% { stroke-width: 0; stroke-opacity: 0.7; } 50% { stroke-width: 10; stroke-opacity: 0.08; } }
+@keyframes ent-graph-card-in { from { opacity: 0; transform: translateX(10px); } }
+@media (prefers-reduced-motion: reduce) { .ent-graph-node, .ent-graph-edge, .ent-graph-node .ent-graph-hit, .ent-graph-card { animation: none !important; } .ent-graph-icon { transition: none; } }
+
+/* The Profiles page's builder: a label beside each input, its hint below. */
+.profile-form { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 16px; align-items: start; max-width: 960px; }
+.profile-form > label { padding-top: 7px; }
+.profile-form .mut { font-size: 12px; margin-top: 3px; }
+.profile-problems { margin: 0; padding-left: 18px; color: var(--hi); }
+.profile-notes { margin: 0; padding-left: 18px; color: var(--sev-medium); }
+.profile-text { padding-top: 7px; }
+.where-mark { cursor: help; color: var(--mut); }
+.where-list { margin: 4px 0 0; padding-left: 16px; }
+.where-list li { margin: 2px 0; }
+.profile-form .profile-text.mut { font-size: inherit; margin-top: 0; }
+.profile-alarm { margin-top: 6px; padding: 6px 10px; border-left: 3px solid var(--sev-high); color: var(--sev-high); font-weight: 600; }
+.profile-form input.cond-value.num { width: 90px; }
+.pivot-table { width: 100%; border-collapse: collapse; }
+.pivot-table th, .pivot-table td { text-align: left; padding: 4px 6px; vertical-align: middle; }
+.pivot-table input { width: 100%; max-width: none; }
+/* A button that cannot be used now looks it (Save waits for a profile Signal accepts). */
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ATT&CK coverage matrix (Overview, matrix.js). Five coverage bands, red to
+   green, as tints of the card so the cell's text keeps its ink; the count is
+   written in every cell, so the colour is never the only reading. */
+:root { --cov-0: #dc2626; --cov-1: #ea580c; --cov-2: #ca8a04; --cov-3: #15803d; --cov-mix: 26%; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --cov-0: #f87171; --cov-1: #fb923c; --cov-2: #facc15; --cov-3: #4ade80; --cov-mix: 30%; } }
+:root[data-theme="dark"] { --cov-0: #f87171; --cov-1: #fb923c; --cov-2: #facc15; --cov-3: #4ade80; --cov-mix: 30%; }
+.matrix-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 4px 0 10px; }
+.matrix-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; }
+.matrix-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.matrix-legend i { display: inline-block; width: 14px; height: 14px; border-radius: var(--r); border: 1px solid var(--bd); }
+.matrix-frame { overflow: auto; max-height: calc(100vh - 160px); border: 1px solid var(--bd); border-radius: var(--r); }
+.matrix-modes { margin-left: auto; display: flex; gap: 4px; }
+.matrix-modes button { min-width: 30px; }
+/* Filling the window or the screen (bigModeButtons): the bar on top, the matrix the rest. */
+.matrix-wrap:fullscreen, .matrix-wrap.full-window { background: var(--bg); padding: 10px; display: flex; flex-direction: column; }
+.matrix-wrap:fullscreen .matrix-frame, .matrix-wrap.full-window .matrix-frame { flex: 1; max-height: none; }
+.attack-matrix { display: grid; gap: 4px; padding: 4px; align-items: start; }
+.matrix-col { display: flex; flex-direction: column; gap: 3px; min-width: 150px; }
+.matrix-head { position: sticky; top: 0; z-index: 2; background: var(--card); padding: 6px 4px; font-weight: 600; font-size: 12px; border-bottom: 2px solid var(--bd); }
+.matrix-head .mut { font-weight: 400; }
+.matrix-group { display: flex; flex-direction: column; gap: 2px; position: relative; }
+.matrix-cell { border-radius: var(--r); border-left: 4px solid var(--c, var(--bd)); background: color-mix(in srgb, var(--c, var(--bd)) var(--cov-mix), var(--card)); font-size: 12px; }
+.matrix-cell .has-tip { display: block; }
+.matrix-body { padding: 3px 5px; }
+.matrix-name { line-height: 1.25; overflow-wrap: anywhere; }
+.matrix-meta { display: flex; flex-wrap: wrap; gap: 0 6px; align-items: center; white-space: nowrap; justify-content: space-between; color: var(--mut); font-size: 11px; margin-top: 2px; }
+.matrix-sub { margin-left: 6px; }
+.matrix-caret { position: absolute; right: 2px; top: 2px; z-index: 1; font-size: 11px; padding: 0 4px; border: 0; background: transparent; color: var(--mut); cursor: pointer; }
+.matrix-group:has(.matrix-caret) > .matrix-cell .matrix-body { padding-right: 30px; }
+.matrix-flag { display: inline-block; min-width: 14px; height: 14px; line-height: 14px; text-align: center; border-radius: var(--r); background: var(--st-notrun); color: #fff; font-weight: 700; font-size: 10px; }
+.matrix-missed { color: var(--st-notrun); margin-top: 2px; }
+.cov-0 { --c: var(--cov-0); } .cov-1 { --c: var(--cov-1); } .cov-2 { --c: var(--cov-2); } .cov-3 { --c: var(--cov-3); }
+.matrix-legend i.cov-0, .matrix-legend i.cov-1, .matrix-legend i.cov-2, .matrix-legend i.cov-3 { background: var(--c); }
+.cov-out { --c: var(--bd); color: var(--mut); background-image: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--bd) 40%, transparent) 6px 7px); }
+.cov-out-col .matrix-head { color: var(--mut); }
+
+/* Loading: the start-up splash (index.html) over everything until the first
+   page is on screen, and the same loader in a page while it loads - the
+   logo's mark breathing over a bar that runs. A page's loader shows only
+   after a moment, so a fast page never flashes it. */
+.splash { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: var(--bg); transition: opacity .35s ease; }
+.splash.gone { opacity: 0; pointer-events: none; }
+.loader { display: grid; justify-items: center; gap: 14px; }
+.loader .brand-mark { width: 56px; height: 56px; animation: loader-breathe 1.6s ease-in-out infinite; }
+.splash .brand-word { width: 150px; height: 24px; }
+.loader-slogan { color: var(--mut); font-size: 12px; letter-spacing: .02em; }
+.loader-bar { position: relative; width: 140px; height: 2px; border-radius: var(--r); overflow: hidden; background: color-mix(in srgb, var(--acc) 18%, transparent); }
+.loader-bar::after { content: ''; position: absolute; inset: 0; width: 40%; border-radius: var(--r); background: var(--acc); animation: loader-run 1.2s ease-in-out infinite; }
+.page-loading { display: grid; place-items: center; min-height: 50vh; opacity: 0; animation: loader-in .3s ease .25s forwards; }
+.page-loading .brand-mark { width: 40px; height: 40px; }
+.page-loading .mut { font-size: 13px; }
+@keyframes loader-breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.92); opacity: .75; } }
+@keyframes loader-run { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+@keyframes loader-in { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .loader .brand-mark, .loader-bar::after { animation: none; } .loader-bar::after { width: 100%; opacity: .5; } .page-loading { animation-duration: .01s; } }
+
+/* The Topology page's map: subnets as boxes, hosts as dots, recorded
+   connections as curves - the accent for lines, the page's own colors
+   for everything else, so both themes read. */
+.topo-frame { overflow-x: auto; }
+.topo-frame svg { display: block; max-width: none; }
+.topo-box { fill: var(--card); stroke: var(--bd); stroke-width: 1; }
+.topo-subnet { fill: var(--fg); font: 600 14px var(--mono, ui-monospace, monospace); }
+.topo-meta { fill: var(--mut); font-size: 11px; }
+.topo-box.virtual { stroke-dasharray: 6 4; fill: color-mix(in srgb, var(--card) 70%, transparent); }
+.topo-bus, .topo-drop, .topo-uplink { stroke: var(--mut); stroke-width: 2; }
+.topo-host.virtual .topo-drop { stroke-dasharray: 3 3; }
+.topo-device { fill: color-mix(in srgb, var(--acc) 18%, var(--card)); stroke: var(--acc); stroke-width: 1.5; }
+.topo-device.dc { stroke: var(--fg); stroke-width: 2; }
+.topo-device.router { stroke: var(--fg); fill: var(--card); }
+.topo-host.virtual .topo-device { stroke-dasharray: 3 2; opacity: .8; }
+.topo-host { cursor: default; }
+.topo-host-name { fill: var(--fg); font-size: 12px; font-weight: 600; }
+.topo-host-addr { fill: var(--mut); font-size: 11px; }
+.topo-link { fill: none; stroke: var(--acc); stroke-width: 1.6; opacity: .7; transition: opacity .2s ease; }
+.topo-link.across { stroke-dasharray: 7 4; }
+.topo-link:hover, .topo-link.on { opacity: 1; stroke-width: 2.6; }
+svg.lit .topo-link:not(.on) { opacity: .12; }
+.topo-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; font-size: 12px; }
+.topo-key { display: inline-flex; align-items: center; gap: 6px; }
+.topo-key i { display: inline-block; width: 18px; height: 12px; }
+.topo-key .k-box { border: 1px solid var(--bd); background: var(--card); border-radius: 2px; }
+.topo-key .k-box.virtual { border-style: dashed; }
+.topo-key .k-link { height: 0; border-top: 2px solid var(--acc); }
+.topo-key .k-link.across { border-top-style: dashed; }
+.topo-dev-note { margin-bottom: 10px; padding: 10px 14px; border: 1px solid #ca8a04; border-radius: var(--r); background: #fde047; color: #1c1917; }
+
+/* A module badge's "+N" (moduleBadge): the modules past the first four, shown on click. */
+.badge-more { padding: 0 5px; border: 1px solid var(--bd); border-radius: var(--r); background: var(--card); color: var(--acc); font: inherit; cursor: pointer; transition: border-color var(--t); }
+.badge-more:hover { border-color: var(--acc); }
+
+/* The entity graph's added options (graph.js): labelled filters in its bar,
+   analyst flags, the analyst's own entities and links, time labels when
+   arranged as a timeline, and the multi-host ring that marches. */
+.ent-graph-ctl { display: inline-flex; align-items: center; gap: 5px; padding-left: 4px; font-size: 12px; background: color-mix(in srgb, var(--card) 85%, transparent); backdrop-filter: blur(6px); }
+.ent-graph-zoom select { padding: 5px 8px; background: color-mix(in srgb, var(--card) 85%, transparent); }
+.ent-graph-flagmark { fill: var(--hi); stroke: var(--hi); stroke-width: 2; pointer-events: none; }
+/* VirusTotal's mark: its answer, drawn apart from Signal's severity. */
+.ent-graph-vtmark rect { fill: var(--sev-high); }
+.ent-graph-vtmark text { fill: #fff; font: 700 8px var(--mono); text-anchor: middle; stroke: none; }
+.ent-graph-when { display: none; font-size: 9.5px; fill: var(--mut); text-anchor: middle; paint-order: stroke; stroke: var(--card); stroke-width: 3px; font-family: var(--mono); }
+.ent-graph.timeline .ent-graph-node:not([style*="none"]) .ent-graph-when { display: inline; }
+/* The analyst's: a dashed square frame and dashed lines in the accent, an italic label. */
+.ent-graph-frame-analyst { fill: color-mix(in srgb, var(--acc) 10%, transparent); stroke: var(--acc); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.ent-graph-node.analyst text { font-style: italic; fill: var(--acc); }
+.ent-graph-edge.analyst { stroke: var(--acc); stroke-dasharray: 6 4; stroke-opacity: .8; }
+.ent-graph-analyst-note { color: var(--acc); font-size: 12px; }
+/* On more than one host: the dashed ring marches round and breathes, to catch the eye. */
+.ent-graph-ring { stroke: var(--acc); stroke-width: 1.6; stroke-dasharray: 4 3; animation: ring-march 1.6s linear infinite, ring-breathe 2.4s ease-in-out infinite; }
+@keyframes ring-march { to { stroke-dashoffset: -14; } }
+@keyframes ring-breathe { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: .35; } }
+@keyframes edge-flow { to { stroke-dashoffset: -22; } }
+/* Hovering an entity: it, its links and their lines stay; the rest dims. */
+.ent-graph-node, .ent-graph-edge { transition: opacity .2s ease, stroke .2s ease; }
+.ent-graph.hovering .ent-graph-node:not(.near) { opacity: .28; }
+.ent-graph.hovering .ent-graph-edge:not(.near) { opacity: .12; }
+.ent-graph.hovering .ent-graph-edge.near { stroke: var(--acc); }
+/* The shortest path: its lines solid and thick in the accent, its entities never dimmed. */
+.ent-graph .ent-graph-edge.path { stroke: var(--acc); stroke-width: 3.2px; stroke-dasharray: none; opacity: 1; animation: none; }
+.ent-graph.focus .ent-graph-node.onpath { opacity: 1; }
+.ent-graph-node.onpath .ent-graph-hit { stroke: var(--acc); stroke-width: 2.5; }
+.ent-graph-step { padding: 2px 0 2px 10px; font-size: 11.5px; border-left: 2px solid var(--acc); margin-left: 8px; }
+.ent-graph-card .detail-title { margin-top: 6px; }
+.ent-graph-frame:focus-visible { outline: 1px solid var(--acc); outline-offset: 2px; }
+/* Off screen: every animation of the graph pauses. */
+.ent-graph.idle, .ent-graph.idle * { animation-play-state: paused !important; }
+/* The graph's bar and cards stay below a page's sticky filter bar (--bar-shift, graph.js placeBar). */
+.ent-graph-zoom { transform: translateY(var(--bar-shift, 0px)); }
+.ent-graph-cards { top: calc(var(--bar-h, 34px) + 16px + var(--bar-shift, 0px)); bottom: auto; max-height: calc(100% - var(--bar-h, 34px) - 24px - var(--bar-shift, 0px)); transition: width .2s var(--ease); }
+/* Folded: only the tab, at the right edge. */
+.ent-graph-fold { align-self: flex-end; pointer-events: auto; font-size: 12px; padding: 3px 10px; background: color-mix(in srgb, var(--card) 92%, transparent); }
+.ent-graph-cards.shut { width: auto; }
+
+/* Reports: what is still open before a report, and the report form. */
+.report-warn { border-left: 3px solid var(--attn); }
+.report-warn ul { margin: 6px 0 0; padding-left: 18px; }
+.report-form { display: flex; flex-direction: column; gap: 10px; }
+.report-form textarea { width: 100%; box-sizing: border-box; }
+
+/* The finder (finder.js): a panel over the page, from the top bar or Ctrl+K. */
+.finder-veil { position: fixed; inset: 0; z-index: 100; background: color-mix(in srgb, var(--bg) 55%, transparent); display: flex; justify-content: center; align-items: flex-start; padding: 10vh 16px 16px; }
+.finder { width: min(720px, 100%); max-height: 75vh; display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--card); border: 1px solid var(--bd); border-radius: var(--r); box-shadow: 0 12px 32px rgba(0, 0, 0, .25); }
+.finder-bar { display: flex; gap: 8px; align-items: center; }
+.finder-bar input { flex: 1; min-width: 0; }
+.finder-note { font-size: 12px; }
+.finder-results { overflow-y: auto; display: flex; flex-direction: column; }
+.finder-row { padding: 8px 2px; border-top: 1px solid var(--bd); overflow-wrap: anywhere; }
+.finder-hosts { font-size: 12.5px; margin-top: 2px; }
+
+/* Overview's time rail (signals.js signalRail): its bar, and a signal per row, no data - a link. */
+.stl-bar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; align-items: center; margin-bottom: 8px; }
+.stl-bar .ent-graph-search { margin-right: auto; }
+.stl-opt { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; }
+.stl-opt select { padding: 5px 8px; }
+a.rail-row { display: block; color: inherit; text-decoration: none; }
+a.rail-row:hover .ent-sig-title { color: var(--acc); }
+a.rail-row.closed { opacity: .5; } a.rail-row.closed:hover { opacity: .85; }
+.rail-panel .ent-rail { margin-top: 8px; }
+
+/* A signal's fields: each title on one line with its kind's icon, the values wrap; a signal of several
+   matches says what all share and what is its first match's (signals.js detailsTable). */
+.sig-table td.sig-field-k { white-space: nowrap; width: 1%; padding-right: 16px; }
+.sig-field-k .icon { margin-right: 6px; opacity: .75; } .sig-field-k .icon svg { width: 13px; height: 13px; }
+.sig-table td + td { overflow-wrap: anywhere; }
+.sig-table tr.sig-table-sub td { padding-top: 12px; font-weight: 650; color: var(--fg); border-bottom: 1px solid var(--bd); }
+.sig-table tr.sig-table-sub:first-child td { padding-top: 4px; }
+/* Triage: what a decision applies to, and a note's light markdown. */
+.triage-applies { display: grid; gap: 4px; padding: 8px 10px; margin-bottom: 8px; border: 1px solid var(--bd); border-radius: var(--r); background: var(--card); }
+.triage-pick { display: flex; gap: 6px; align-items: center; font-size: 12.5px; cursor: pointer; }
+.triage-pick.all { font-weight: 650; padding-bottom: 4px; border-bottom: 1px solid var(--bd); }
+.md-note { font-size: 13px; line-height: 1.5; } .md-note ul { margin: 2px 0 2px 18px; padding: 0; }
+.md-note code { font-family: var(--mono); font-size: 12px; padding: 0 4px; background: var(--raise); border: 1px solid var(--bd); border-radius: var(--r); }
+.md-preview { min-height: 54px; padding: 6px 10px; border: 1px dashed var(--bd); border-radius: var(--r); }
+.triage-change { padding: 4px 0; border-bottom: 1px dashed color-mix(in srgb, var(--bd) 60%, transparent); }
+.triage-change .md-note { margin: 2px 0 0 12px; }
+
+/* A table's rows with nothing open (dataTable rowClass): faded, a space where the open ones end. */
+tr.row-closed > td { opacity: .5; } tr.row-closed:hover > td { opacity: .85; }
+tr.group-start > td { border-top: 18px solid transparent; } /* a space where the open ones end */
+
+/* The Timeline page's day headers on the rail (signals.js timeRail opts.days). */
+.rail-day { position: relative; z-index: 1; display: flex; gap: 12px; align-items: baseline; margin: 14px 0 4px 96px; padding: 4px 10px; width: fit-content;
+  background: var(--raise); border: 1px solid var(--bd); border-radius: 12px; font-size: 12.5px; scroll-margin-top: 120px; }
+.rail-day:first-child { margin-top: 0; }
+.rail-day-date b { font-family: var(--mono); margin-left: 4px; }
+.rail-day.flash { border-color: var(--acc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 30%, transparent); transition: box-shadow .3s; }
+
+/* The Timeline page: tags on each item, events added by hand in their own colour (--manual, shared with
+   nothing else), each host's signals found at collection as one folded block, and the event form. */
+.date-box { min-width: 150px; cursor: pointer; }
+.date-box::-webkit-calendar-picker-indicator { cursor: pointer; opacity: .7; }
+.date-box::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+.tl-tags { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 3px 0 2px 12px; }
+.tl-tag { display: inline-flex; align-items: center; gap: 2px; padding: 0 2px 0 8px; font: 11.5px var(--mono); border: 1px solid color-mix(in srgb, var(--acc) 45%, var(--bd)); border-radius: 10px; color: var(--acc); }
+.tl-tag-x, .tl-tag-add { border: 0; background: none; padding: 0 5px; color: var(--mut); cursor: pointer; font-size: 12px; }
+.tl-tag-x:hover, .tl-tag-add:hover { color: var(--acc); }
+.tl-tag:not(:has(.tl-tag-x)) { padding-right: 8px; }
+.tl-tag-input { width: 140px; padding: 1px 8px; font: 11.5px var(--mono); }
+.rail-manual { border: 1px dashed var(--manual); border-left: 3px solid var(--manual); background: color-mix(in srgb, var(--manual) 7%, var(--card)); }
+.rail-manual .ent-sig-title { color: var(--manual); }
+.rail-manual .ent-sig-tri { display: flex; gap: 4px; }
+.tl-manual-tag { font: 600 10.5px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--manual); padding: 1px 6px; border: 1px solid var(--manual); border-radius: 10px; }
+.tl-desc { font-size: 12.5px; color: var(--mut); white-space: pre-wrap; margin-top: 2px; }
+.tl-manual-count .v { color: var(--manual); }
+.tl-add-btn { border: 1px solid var(--manual); color: var(--manual); background: color-mix(in srgb, var(--manual) 10%, transparent); }
+.tl-add-btn:hover { background: color-mix(in srgb, var(--manual) 20%, transparent); }
+.rail-collection { border: 1px dotted var(--bd); }
+.rail-collection > summary { cursor: pointer; padding: 8px 12px; list-style-position: inside; }
+.rail-collection-list { display: grid; gap: 4px; padding: 4px 8px 8px; }
+.tl-form { border-top: 3px solid var(--manual); }
+.tl-form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 14px; margin: 10px 0; }
+.tl-field { display: grid; gap: 4px; font-size: 12px; color: var(--mut); }
+.tl-field.wide { grid-column: 1 / -1; }
+.tl-field :is(input, select, textarea) { width: 100%; box-sizing: border-box; font-size: 13px; color: var(--fg); }
+.tl-form-err { color: var(--st-flagged); font-size: 12.5px; min-height: 1em; }
+/* What each time on a rail is (Signal's time_is, or an anchor's what): under the time, small, wrapped. */
+.ent-step-is { font: 10px/1.25 var(--sans); color: var(--mut); margin-top: 2px; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ent-step-when.ranged .ent-step-is { color: var(--attn); }
+
+/* ---- Section navigator (sectionNav.js) -------------------------------- */
+/* A rail of ticks at the right edge, one per panel; the panel in view has
+   the long accent tick; hovering the rail unfolds the titles beside them. */
+.section-nav { position: fixed; right: 6px; top: 50%; z-index: 40; display: none; flex-direction: column; align-items: flex-end; gap: 2px;
+  max-height: 70vh; overflow-y: auto; scrollbar-width: none; padding: 6px 4px; transform: translateY(-50%);
+  border-radius: var(--r); transition: background .2s var(--ease), box-shadow .2s var(--ease); }
+.section-nav::-webkit-scrollbar { display: none; }
+.section-nav.shown { display: flex; animation: nav-in .35s var(--ease) backwards; }
+@keyframes nav-in { from { opacity: 0; translate: 8px 0; } }
+.section-nav button { display: flex; align-items: center; justify-content: flex-end; gap: 8px; background: none; border: 0; padding: 3px 2px; cursor: pointer; color: var(--mut); font: 11.5px/1.2 var(--sans); }
+.section-nav-tick { flex: none; display: block; width: 10px; height: 2px; background: color-mix(in srgb, var(--fg) 35%, transparent); border-radius: 1px; transition: width .25s var(--ease), background .25s var(--ease); }
+.section-nav-label { max-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; opacity: 0; transition: max-width .3s var(--ease), opacity .2s var(--ease); }
+.section-nav button.on .section-nav-tick { width: 18px; background: var(--acc); }
+.section-nav button:hover .section-nav-tick { width: 18px; background: var(--fg); }
+.section-nav:hover, .section-nav:focus-within { background: color-mix(in srgb, var(--card) 94%, transparent); box-shadow: 0 0 0 1px var(--bd), 0 8px 24px -12px color-mix(in srgb, var(--fg) 45%, transparent); backdrop-filter: blur(6px); }
+.section-nav:hover .section-nav-label, .section-nav:focus-within .section-nav-label { max-width: 220px; opacity: 1; }
+.section-nav button.on { color: var(--acc); }
+.section-nav button:hover { color: var(--fg); }
+body.home .section-nav { display: none; }
+body:has(.section-nav.shown):not(.home) main { padding-right: 40px; } /* room for the rail's ticks */
+@media (max-width: 720px) { .section-nav { right: 2px; } body:has(.section-nav.shown):not(.home) main { padding-right: 26px; } .section-nav-tick { width: 7px; } .section-nav button.on .section-nav-tick { width: 12px; } }
+@media (prefers-reduced-motion: reduce) { .section-nav, .section-nav *, .card.nav-flash { transition: none; animation: none; } #app .card:hover { top: 0; } }
+
+/* Settings, Links: one choice a line. */
+.link-modes { display: grid; gap: 10px; }
+.link-mode { display: flex; gap: 8px; align-items: baseline; }
+
+/* The top bar's background tasks menu (public/js/tasks.js). */
+#tasksBtn { position: relative; }
+#tasksBtn .task-count { position: absolute; top: -4px; right: -4px; min-width: 14px; padding: 0 3px; border-radius: 7px; background: var(--acc); color: var(--bg); font-size: 10px; line-height: 14px; text-align: center; }
+#tasksBtn .task-count:empty { display: none; }
+#tasksBtn.tasks-busy .icon svg { animation: task-turn 1.6s linear infinite; }
+@keyframes task-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { #tasksBtn.tasks-busy .icon svg { animation: none; } }
+.tasks-panel { position: fixed; z-index: 40; width: 360px; max-width: calc(100vw - 16px); display: grid; gap: 12px; }
+.task-title { font-weight: 650; }
+.task-row { display: grid; gap: 4px; }
+.task-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.task-bar { height: 4px; background: var(--bd); border-radius: 2px; overflow: hidden; }
+.task-bar span { display: block; height: 100%; background: var(--acc); }
+.task-n { font-size: 11.5px; }
+
+/* A header in alarm (dataTable column alarm): the Flagged column's flag
+   while a row is flagged - a ring that swells and fades, and the flag
+   rocks, like an alarm. Still under reduced motion: the ring stays drawn. */
+th.th-alarm .icon { position: relative; color: var(--sev-high); }
+th.th-alarm .icon::after { content: ''; position: absolute; inset: -5px; border: 2px solid var(--sev-high); border-radius: 50%; animation: alarm-ring 1.2s ease-out infinite; pointer-events: none; }
+th.th-alarm .icon svg { animation: alarm-rock 1.2s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes alarm-ring { 0% { transform: scale(.6); opacity: .9; } 70% { transform: scale(1.35); opacity: 0; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes alarm-rock { 0%, 50%, 100% { transform: translateY(0) rotate(0); } 10% { transform: translateY(-2px) rotate(-12deg); } 20% { transform: translateY(0) rotate(10deg); } 30% { transform: translateY(-1px) rotate(-6deg); } 40% { transform: translateY(0) rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { th.th-alarm .icon::after, th.th-alarm .icon svg { animation: none; } th.th-alarm .icon::after { opacity: .7; } }
+
+/* A flag's reasons, under it (table.js flagCell). */
+.flag-cell { display: grid; gap: 4px; min-width: 180px; }
+.flag-cell .flag-btn, .flag-cell > .flag-on, .flag-cell > .flag-off { justify-self: start; }
+.flag-cell .flag-btn.flag-mine { outline: 1px solid var(--sev-high); outline-offset: 1px; }
+.flag-why { display: grid; gap: 3px; font-size: 12px; white-space: normal; }
+.flag-why b { font-weight: 600; color: var(--sev-high); }
+
+/* Settings, Users: an account's changes in its row (settings.js accountsView). */
+.account-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+/* The update banner (public/js/updates.js): under the top bar, a line in the
+   colour of what it says - a restart coming, a withdrawn version, news. */
+.update-banner { margin: 0 16px; padding: 8px 12px; border-left: 3px solid var(--acc); background: var(--card); font-size: 13px; }
+.update-banner[hidden] { display: none; }
+.update-banner.update-warn { border-left-color: var(--attn); }
+.update-banner.update-bad { border-left-color: var(--hi); color: var(--hi); }
+.update-banner a { margin-left: 4px; }
+.withdrawn-tag { color: var(--hi); }
+
+/* An entity page opened from the Timeline: the way back, kept at the window's top left (the page opens scrolled to the signal). */
+.tl-back { position: sticky; top: 8px; z-index: 31; width: fit-content; margin-bottom: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600; background: var(--card); border: 1px solid var(--acc); border-radius: var(--r); box-shadow: 0 4px 12px color-mix(in srgb, var(--bg) 60%, transparent); }

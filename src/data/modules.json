@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Applications",
+    "params": null
+  },
+  {
+    "name": "Backup",
+    "params": null
+  },
+  {
+    "name": "Browsers",
+    "params": null
+  },
+  {
+    "name": "Directory",
+    "params": null
+  },
+  {
+    "name": "Executions",
+    "params": null
+  },
+  {
+    "name": "LogIntegrity",
+    "params": [
+      {
+        "name": "max_rows",
+        "kind": "int",
+        "doc": "the most rows of each table (default 10000)"
+      }
+    ]
+  },
+  {
+    "name": "Logons",
+    "params": [
+      {
+        "name": "max_rows",
+        "kind": "int",
+        "doc": "the most rows of each table (default 10000)"
+      }
+    ]
+  },
+  {
+    "name": "Network",
+    "params": null
+  },
+  {
+    "name": "Persistence",
+    "params": [
+      {
+        "name": "all",
+        "kind": "bool",
+        "doc": "true lists Windows' own entries too (default: left out, counted)"
+      }
+    ]
+  },
+  {
+    "name": "Protection",
+    "params": null
+  },
+  {
+    "name": "RemoteAccess",
+    "params": [
+      {
+        "name": "approved_tools",
+        "kind": "list",
+        "doc": "the approved remote access products, one per line: a product's name, or name@tenant to approve only its instances enrolled to that account, tenant or server (e.g. TeamViewer@it@example.com); without it, authorization is unknown and RA-NOT-ALLOWED is not run"
+      }
+    ]
+  },
+  {
+    "name": "Scope",
+    "params": null
+  },
+  {
+    "name": "Users",
+    "params": null
+  },
+  {
+    "name": "Webshells",
+    "params": null
+  }
+]

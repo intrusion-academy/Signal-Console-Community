@@ -1,0 +1,89 @@
+# Signal Community License 1.0.0
+
+Copyright 2026 Intrusion Academy (https://intrusion.academy/signal). All rights reserved except as expressly granted below.
+
+These terms are adapted from the PolyForm Internal Use License 1.0.0 <https://polyformproject.org/licenses/internal-use/1.0.0>. They are not a PolyForm license and are not endorsed by the PolyForm Project.
+
+## 1. Acceptance
+
+1.1. By downloading, installing, copying or using the Software, you agree to these terms. You must agree to them as both strict obligations and conditions of every license granted to you. If you do not agree, you may not use the Software.
+
+## 2. Copyright License
+
+2.1. Subject to these terms, the Licensor grants you a worldwide, non-exclusive, non-transferable, non-sublicensable, royalty-free copyright license to use, copy and run the Software for a Permitted Purpose.
+
+2.2. The Licensor also grants you a license to make changes and new works based on the Software, solely for a Permitted Purpose and solely for use within Your Organisation.
+
+2.3. You may not distribute, publish, sell, rent, lease, lend or otherwise make the Software, or any change or new work based on it, available to anyone outside Your Organisation, except by referring them to the Licensor's own official distribution.
+
+## 3. Patent License
+
+3.1. The Licensor grants you a patent license for the Software that covers the patent claims the Licensor can license, or becomes able to license, that you would infringe by using the Software for a Permitted Purpose.
+
+3.2. If you, or Your Organisation, make any written claim that the Software infringes or contributes to infringement of any patent, your patent license ends immediately.
+
+## 4. Permitted Purpose
+
+4.1. A **Permitted Purpose** is the use of the Software to defend the computers, networks and systems that you or Your Organisation own or operate, including your own incident response, threat hunting, compromise assessment and security monitoring.
+
+4.2. Personal, educational and non-commercial research use is also a Permitted Purpose.
+
+## 5. Uses Requiring a Commercial License
+
+5.1. The following are not Permitted Purposes. Each requires a separate written commercial license (Signal Pro or Signal Enterprise) from the Licensor:
+
+(a) using the Software, or its output, to provide any service to a person or organisation outside Your Organisation, whether paid or not, including incident response, digital forensics, compromise assessment, gap assessment, threat hunting and managed detection and response;
+
+(b) selling, renting, sublicensing or otherwise commercialising the Software;
+
+(c) incorporating the Software, its rules, its output formats or any part of it into a product or service offered to others; and
+
+(d) using any feature, module, rule or edition that the Licensor makes available only under a commercial license.
+
+## 6. Notices
+
+6.1. You must keep intact every copyright, license and attribution notice in the Software, including the NOTICE file, and you must not remove or alter any license check or edition marking in the Software.
+
+## 7. Trademarks
+
+7.1. These terms grant no right to use the names "Signal", "Signal Console" or "Intrusion Academy", or any logo of the Licensor, except to identify the Software truthfully.
+
+## 8. Fair Use
+
+8.1. You may have "fair use" or equivalent rights under applicable law. These terms do not limit them.
+
+## 9. No Other Rights
+
+9.1. These terms do not allow you to sublicense or transfer any of your licenses to anyone else, and they do not prevent the Licensor from granting licenses to anyone else. No other license is implied.
+
+## 10. Violations
+
+10.1. The first time you are notified in writing that you have violated these terms, or done anything with the Software not covered by your licenses, your licenses may continue if you come into full compliance and take practical steps to correct past violations within thirty-two (32) days of receiving the notice. Otherwise, all your licenses end immediately.
+
+## 11. Disclaimer of Warranty
+
+11.1. ***To the fullest extent permitted by law, the Software is provided "as is", without warranty or condition of any kind, express or implied, including any warranty of merchantability, fitness for a particular purpose, accuracy or non-infringement.***
+
+11.2. The Software reports what the inspected systems record. It does not guarantee that a compromise, or the absence of one, will be detected.
+
+## 12. Limitation of Liability
+
+12.1. ***To the fullest extent permitted by law, the Licensor will not be liable to you for any direct, indirect, incidental, special, consequential or exemplary damages, or for any loss of data, profit or business, arising out of these terms or the use or nature of the Software, under any legal theory, even if advised of the possibility of such damages.***
+
+## 13. Definitions
+
+13.1. The **Licensor** is Intrusion Academy.
+
+13.2. The **Software** is Signal and Signal Console, Community Edition, as the Licensor makes them available under these terms, together with their documentation.
+
+13.3. **You** means the individual or legal entity agreeing to these terms.
+
+13.4. **Your Organisation** means the legal entity you work for or represent, together with every entity that controls it, is controlled by it, or is under common control with it. **Control** means ownership of more than fifty percent of the voting interests of an entity, or the power to direct its management and policies by contract or otherwise.
+
+13.5. **Use** means anything you do with the Software that requires one of your licenses.
+
+## 14. General
+
+14.1. If any provision of these terms is held unenforceable, the remaining provisions remain in effect. A commercial license agreement between you and the Licensor prevails over these terms to the extent they conflict.
+
+Contact: https://intrusion.academy/signal
