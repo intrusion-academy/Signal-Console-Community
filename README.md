@@ -208,6 +208,12 @@ Third-party packages: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 ---
 
 <p align="center">
+  <a href="https://intrusion.academy/signal">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/assets/intrusion-academy-dark.png">
+      <img src=".github/assets/intrusion-academy-light.png" alt="Intrusion Academy" width="240">
+    </picture>
+  </a><br>
   Signal is developed by <a href="https://intrusion.academy/signal">Intrusion Academy</a><br>
   <a href="https://intrusion.academy/signal">Website</a> ·
   <a href="https://intrusion.academy/signal/doc/latest">Documentation</a> ·
