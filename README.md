@@ -99,7 +99,7 @@ example a share:
 signal live -all -o \\fileserver\signal-runs\
 ```
 
-**Step 4. Import the runs.** Sign in, open **Import** and select the run files.
+**Step 4. Import the runs.** Sign in and click the **Import** button (the upload arrow at the top right). Then click **Choose Files** and select the run files, or drag them onto the dashed box.
 
 - Up to 200 files per upload, up to 50 MB each.
 - Each file is validated before it is stored. A file from a newer Signal is refused with the reason.
