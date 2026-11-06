@@ -19,7 +19,7 @@
     "multer": "^2.0.0"
   },
   "devDependencies": {
-    "eslint": "^9.39.5",
+    "eslint": "^10.14.0",
     "jsdom": "^30.1.1"
   }
 }
