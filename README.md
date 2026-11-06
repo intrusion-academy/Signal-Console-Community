@@ -23,6 +23,8 @@ Signal writes on each host and shows all hosts in one place.
 > **Full documentation:** [intrusion.academy/signal/doc/latest](https://intrusion.academy/signal/doc/latest)<br>
 > **Download Signal:** [intrusion.academy/signal](https://intrusion.academy/signal)
 
+<br>
+
 ## Contents
 
 1. [How it fits together](#how-it-fits-together)
@@ -33,6 +35,8 @@ Signal writes on each host and shows all hosts in one place.
 6. [Security](#security)
 7. [Editions](#editions)
 8. [License](#license)
+
+<br>
 
 ## How it fits together
 
@@ -48,6 +52,8 @@ This repository is the console only. Signal itself is a separate executable.
 | **Signal Console** | Imports the run files of all hosts for review and triage. | This repository |
 | **Documentation** | Modules, rules, output format, deployment, console pages. | [intrusion.academy/signal/doc/latest](https://intrusion.academy/signal/doc/latest) |
 
+<br>
+
 ## Features
 
 | Feature | Description |
@@ -61,6 +67,8 @@ This repository is the console only. Signal itself is a separate executable.
 | Topology | The networks the hosts are on and the connections between them. |
 | Reports | A compromise assessment report from the findings and their triage. |
 | Self-hosted | No cloud service, no telemetry, no build step. Local accounts, roles, audit log, HTTPS. |
+
+<br>
 
 ## Quick start
 
@@ -80,7 +88,9 @@ npm start
 ```
 
 On first start, the console asks in the terminal for an administrator name
-and password. It then listens on <http://localhost:7446>.
+and password. It then listens on <http://localhost:7446>. Sign in with that account.
+
+<p align="center"><img src=".github/assets/console-login.png" alt="The Signal Console sign-in page" width="90%"></p>
 
 **Step 3. Run Signal on each host.** Write the run files to one folder, for
 example a share:
@@ -95,6 +105,22 @@ signal live -all -o \\fileserver\signal-runs\
 - Each file is validated before it is stored. A file from a newer Signal is refused with the reason.
 - The console holds one set of runs. Remove runs on the same page.
 
+<p align="center"><img src=".github/assets/console-import.png" alt="The Import page with seven runs from six hosts imported" width="90%"></p>
+
+**Step 5. Review.** The **Overview** ranks the hosts by risk and the rules by
+the number of hosts they flagged.
+
+<p align="center"><img src=".github/assets/console-overview.png" alt="The Overview page: hosts ranked by risk and rules ranked by hosts flagged" width="90%"></p>
+
+**Signals** lists what to look at, grouped by the entity it is about. Open a
+row to read and triage everything about that entity.
+
+<p align="center"><img src=".github/assets/console-signals.png" alt="The Signals page: signals grouped by entity, with severity, host and rules" width="90%"></p>
+
+The screenshots use synthetic test data.
+
+<br>
+
 ## Configuration
 
 Set these environment variables before `npm start`:
@@ -106,6 +132,8 @@ Set these environment variables before `npm start`:
 | `SIGNAL_CONSOLE_TLS_CERT` | not set | PEM certificate (with chain) for HTTPS |
 | `SIGNAL_CONSOLE_TLS_KEY` | not set | PEM private key for HTTPS |
 | `SIGNAL_CONSOLE_SECURE_COOKIE` | not set | Set to `1` behind a reverse proxy that terminates HTTPS |
+
+<br>
 
 ## Accounts
 
@@ -129,6 +157,8 @@ Manage accounts on **Settings > Users**, or on the server:
 | `npm run users -- disable <name>` / `enable <name>` | Disable or enable |
 | `npm run users -- remove <name>` | Delete an account |
 
+<br>
+
 ## Security
 
 | Area | Behaviour |
@@ -141,6 +171,8 @@ Manage accounts on **Settings > Users**, or on the server:
 | Transport | Use HTTPS beyond a single machine (see [Configuration](#configuration)) |
 
 To report a vulnerability, see [SECURITY.md](SECURITY.md).
+
+<br>
 
 ## Editions
 
@@ -156,6 +188,8 @@ To report a vulnerability, see [SECURITY.md](SECURITY.md).
 | Engagement support, exclusive threat-intelligence rules, training | No | No | Yes |
 
 Pro, Enterprise, services and training: [intrusion.academy/signal](https://intrusion.academy/signal).
+
+<br>
 
 ## License
 
