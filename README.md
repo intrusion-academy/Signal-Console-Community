@@ -248,8 +248,8 @@ In summary (the license text prevails):
 
 | Use | Terms |
 |---|---|
-| **Allowed** | Use, study and modify, free of charge, to defend the computers and networks you or your organisation own or operate. Personal, educational and non-commercial research use. |
-| **Requires a commercial license** | Services to third parties (incident response, compromise or gap assessments, threat hunting, managed detection), resale or redistribution, or use in another product. |
+| **Allowed** | Use, study and modify within your organisation, free of charge, to defend the computers and networks you or your organisation own or operate. Personal, educational and non-commercial research use. |
+| **Requires a commercial license** | Services to third parties (incident response, compromise or gap assessments, threat hunting, managed detection), resale or redistribution outside your organisation, or use in another product. |
 | **Warranty** | None. Provided "as is". |
 
 Third-party packages: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

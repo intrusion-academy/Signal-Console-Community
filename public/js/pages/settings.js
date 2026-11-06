@@ -338,12 +338,12 @@ function updatesView(u) {
 // licenseView is the edition in force and the terms it is used under.
 function licenseView(l) {
   return h('div', {},
-    h('p', {}, 'This console is the Community edition of Signal Console, licensed under the Signal Community License 1.0.0. It may be used, free of charge, solely to defend the computers and networks that the licensee owns or operates.'),
+    h('p', {}, 'This console is the Community edition of Signal Console, licensed under the Signal Community License 1.0.0. It may be used, free of charge, solely to defend the computers, networks and systems that the licensee's organisation owns or operates, and for personal, educational and non-commercial research use.'),
     h('div', { class: 'facts' }, h('table', {},
       fact('Edition', h('span', { class: 'edition-community' }, l.label)),
       fact('License', l.license),
       fact('Licensor', 'Intrusion Academy'))),
-    h('p', { class: 'mut' }, 'Providing services to any third party, resale, redistribution, and incorporation into another product or service require a commercial license (the Pro or Enterprise edition) from Intrusion Academy. The License page states the terms in full.'));
+    h('p', { class: 'mut' }, 'Providing services to any third party, resale, redistribution outside the organisation, and incorporation into another product or service require a commercial license (the Pro or Enterprise edition) from Intrusion Academy. The License page states the terms in full.'));
 }
 
 // fact is one labelled value of the certificate.

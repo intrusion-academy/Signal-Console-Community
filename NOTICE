@@ -4,11 +4,13 @@ Required Notice: Copyright 2026 Intrusion Academy
 All rights reserved except as granted by the license in LICENSE.
 
 Signal Console (Community Edition) is licensed under the Signal Community License
-1.0.0 (LICENSE): free of charge, solely to defend the computers and
-networks that you or your organisation own or operate. Providing services
-to third parties, resale, redistribution and incorporation into another
-product or service require a commercial license (Signal Pro or Signal
-Enterprise) from Intrusion Academy: https://intrusion.academy/signal
+1.0.0 (LICENSE): free of charge, solely to defend the computers, networks and
+systems that you or your organisation own or operate, and for personal,
+educational and non-commercial research use. Providing any service to a
+third party, resale, redistribution outside your organisation and
+incorporation into another product or service require a commercial
+license (Signal Pro or Signal Enterprise) from Intrusion Academy:
+https://intrusion.academy/signal
 
 Third-party software: the npm packages it runs on are listed, with their
 licenses, in THIRD_PARTY_NOTICES.md; their license texts are in each
