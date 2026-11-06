@@ -120,8 +120,6 @@ row to read and triage everything about that entity.
 
 <p align="center"><img src=".github/assets/console-signals.png" alt="The Signals page: signals grouped by entity, with severity, host and rules" width="90%"></p>
 
-The screenshots use synthetic test data.
-
 <br>
 
 ## Configuration
