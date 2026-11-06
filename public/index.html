@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signal Console</title>
+<link rel="icon" type="image/png" href="/img/signal-mark-light.png">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="splash" id="splash" role="status" aria-label="Signal Console is loading">
+  <div class="loader"><span class="brand-mark"></span><span class="brand-word"></span><span class="loader-slogan">Signal DFIR Survey: The First Minute of Every Investigation. Where to Look &amp; What You Can't See!</span><span class="loader-bar"></span></div>
+</div>
+<aside id="sidebar" class="sidebar">
+  <div class="brand" role="img" aria-label="Signal Console"><span class="brand-mark"></span><span class="nav-label brand-name"><span class="brand-word"></span><span class="mut">Console</span></span></div>
+  <nav id="tabs" aria-label="Pages"></nav>
+  <button class="nav-toggle" id="navToggle"></button>
+</aside>
+<div class="shell">
+  <header>
+    <div class="header-about" id="headerAbout"></div>
+    <div class="header-right">
+      <span class="mut" id="headerStats"></span>
+      <span class="user-box" id="userBox"></span>
+      <button class="btn icon-btn" id="findBtn" title="Find an entity across the hosts (Ctrl+K)" aria-label="Find an entity across the hosts"></button>
+      <button class="btn icon-btn" id="tasksBtn" title="Background tasks" aria-label="Background tasks" aria-haspopup="true"></button>
+      <button class="btn icon-btn" id="importBtn" title="Import Signal runs" aria-label="Import Signal runs"></button>
+      <button class="icon-btn theme-btn" id="themeBtn"></button>
+    </div>
+  </header>
+  <div class="update-banner" id="updateBanner" role="status" hidden></div>
+  <main id="app"></main>
+</div>
+<script type="module" src="/js/main.js"></script>
+</body>
+</html>

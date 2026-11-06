@@ -1,0 +1,9 @@
+node_modules/
+data/signal-console.db*
+data/signal-web.db*
+data/runs/*.json
+!data/runs/.gitkeep
+data/triage.json
+data/kev.json
+data/nvd/
+dist/
