@@ -9,7 +9,7 @@
 </p>
 <p align="center">
   <img alt="Edition" src="https://img.shields.io/badge/edition-Community-22c55e">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.124.0-1e222a">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-1e222a">
   <img alt="Node.js" src="https://img.shields.io/badge/node-%E2%89%A5%2022.5-417e38?logo=nodedotjs&logoColor=white">
   <img alt="Hosts" src="https://img.shields.io/badge/hosts-Windows%2010%20%7C%2011%20%7C%20Server-0078d4">
   <img alt="DFIR" src="https://img.shields.io/badge/DFIR-live%20response-d97706">
