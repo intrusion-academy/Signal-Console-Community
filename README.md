@@ -21,7 +21,8 @@ a Windows DFIR survey tool by Intrusion Academy. It imports the run files
 Signal writes on each host and shows all hosts in one place.
 
 > **Full documentation:** [intrusion.academy/signal/doc/latest](https://intrusion.academy/signal/doc/latest)<br>
-> **Download Signal:** [intrusion.academy/signal](https://intrusion.academy/signal)
+> **Download Signal:** [intrusion.academy/signal](https://intrusion.academy/signal)<br>
+> **Community rule library:** [Signal Rules](https://github.com/intrusion-academy/Signal-Rules): share your rules, or use the community's
 
 <br>
 
@@ -54,6 +55,7 @@ This repository is the console only. Signal itself is a separate executable.
 | **Signal** (`signal.exe`) | Surveys a Windows host in about a minute. Read-only: installs nothing, changes nothing. Writes one JSON run file. | [intrusion.academy/signal](https://intrusion.academy/signal) |
 | **Signal Console** | Imports the run files of all hosts for review and triage. | This repository |
 | **Documentation** | Modules, rules, output format, deployment, console pages. | [intrusion.academy/signal/doc/latest](https://intrusion.academy/signal/doc/latest) |
+| **Signal Rules** | Community rules, reviewed and tested, run beside the built-in ones. Contributions welcome. | [Signal-Rules](https://github.com/intrusion-academy/Signal-Rules) |
 
 <br>
 
@@ -218,6 +220,7 @@ No. Services to third parties need a commercial license (Pro or Enterprise). See
 |---|---|
 | How to use Signal and the console | [Documentation](https://intrusion.academy/signal/doc/latest) |
 | A bug or an improvement | [Open an issue](../../issues/new/choose) (never include host data) |
+| Share a rule, or ask for one | [Signal Rules](https://github.com/intrusion-academy/Signal-Rules) |
 | A security vulnerability | [SECURITY.md](SECURITY.md) (report privately) |
 | Pro, Enterprise, services, training | [intrusion.academy/signal](https://intrusion.academy/signal) |
 

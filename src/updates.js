@@ -36,15 +36,18 @@ const VERSION = require('../package.json').version;
 const PRODUCT = 'signal-console';
 const FORMAT = 1;
 
-// KEYS are the release public keys by key ID (internal/update.Keys).
+// KEYS are the release public keys by key ID.
 const KEYS = {
   '0d7b64c9': '8TWuysi3mfdDAnwKL/u+5id41VjIX83DAbBIJn+Gxww=', // in use (generated 2026-10-26)
   '85cd7db0': 'a5Bj22Wh8qKRMBqD9JxogDKUKSRY+XiN3sPYpxeHGSk=', // backup, kept offline
 };
 
-// SOURCES are where the update file is looked for (internal/update.Sources).
+// SOURCES are where the update file is looked for: the public Community
+// repository's latest release, then its main branch. Signal itself no longer
+// has a list (the signal-update subdomain was removed 2026-11-10).
 const SOURCES = [
-  'https://signal-update.intrusion.academy/updates.json',
+  'https://github.com/intrusion-academy/Signal-Console-Community/releases/latest/download/updates.json',
+  'https://raw.githubusercontent.com/intrusion-academy/Signal-Console-Community/main/updates.json',
 ];
 
 const CHECK_EVERY = 6 * 3600 * 1000;
