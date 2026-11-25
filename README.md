@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://intrusion.academy/signal"><img src=".github/assets/banner.svg" alt="Signal Console, Community Edition, by Intrusion Academy" width="100%"></a>
+  <a href="https://intrusion.academy/signal"><img src=".github/assets/banner.png" alt="Signal Console, Community Edition, by Intrusion Academy" width="100%"></a>
 </p>
 
 <p align="center">
@@ -47,7 +47,7 @@ Signal writes on each host and shows all hosts in one place.
 This repository is the console only. Signal itself is a separate executable.
 
 <p align="center">
-  <img src=".github/assets/how-it-works.svg" alt="signal.exe runs on each host and writes a JSON run file; Signal Console reads the run files of all hosts" width="100%">
+  <img src=".github/assets/how-it-works.png" alt="signal.exe runs on each host and writes a JSON run file; Signal Console reads the run files of all hosts" width="100%">
 </p>
 
 | Part | What it does | Where to get it |
