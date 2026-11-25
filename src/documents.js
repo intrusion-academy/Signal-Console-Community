@@ -83,7 +83,6 @@ function wrap(text, size, width, bold) {
       const next = line ? `${line} ${word}` : word;
       if (textWidth(next, size, bold) <= width) { line = next; continue; }
       if (line) out.push(line);
-      line = '';
       let rest = word;
       while (textWidth(rest, size, bold) > width) {
         let n = rest.length - 1;

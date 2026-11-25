@@ -38,7 +38,7 @@ function get(hash) {
 function save(text, user) {
   if (typeof text !== 'string' || text.length > MAX) throw new Error('not a profile: JSON text of 1 MB at most');
   let p;
-  try { p = JSON.parse(text); } catch (err) { throw new Error(`not JSON: ${err.message}`); }
+  try { p = JSON.parse(text); } catch (err) { throw new Error(`not JSON: ${err.message}`, { cause: err }); }
   if (!p || p.profile !== 1 || typeof p.name !== 'string' || !p.name.trim()) throw new Error('not a profile: it needs "profile": 1 and a name');
   const hash = sha256(text);
   db.main().prepare('INSERT OR REPLACE INTO profiles (sha256, name, doc, saved_by, saved_at) VALUES (?, ?, ?, ?, ?)')
