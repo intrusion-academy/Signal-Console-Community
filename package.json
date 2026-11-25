@@ -8,7 +8,7 @@
     "node": ">=22.5"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "node launch.js",
     "users": "node scripts/users.js",
     "notices": "node scripts/notices.js",
     "sbom": "npm sbom --omit=dev --sbom-format cyclonedx",

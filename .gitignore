@@ -7,3 +7,6 @@ data/triage.json
 data/kev.json
 data/nvd/
 dist/
+# The versions an update unpacks into a git checkout, and which one runs.
+app/
+current.json

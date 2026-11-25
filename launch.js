@@ -1,11 +1,16 @@
 // Signal Console's launcher (Signal's updates documentation) - how a release
-// package is started: `node launch.js` in the install folder.
+// package is started: `node launch.js` in the install folder; in a git
+// checkout, `npm start` runs it too.
 //
 //   <install folder>/
 //     launch.js        this file; never replaced by an update
 //     current.json     the version to start: {version, previous, backup, failed, rolled_back}
 //     app/<version>/   each version's files, side by side
 //     data/            the accounts, settings and runs (SIGNAL_CONSOLE_DATA, unless set)
+//
+// A git checkout is one more version: its own server.js, at its
+// package.json's version. It runs until an update unpacks a newer version in
+// app/, and runs again once a git pull makes it the newest.
 //
 // It starts app/<version>/server.js and waits for it to say it is ready.
 // When the console exits to apply an update (status 75, src/updates.js has
@@ -33,16 +38,42 @@ const DATA = process.env.SIGNAL_CONSOLE_DATA || path.join(ROOT, 'data');
 
 const log = (msg) => console.log(`[launch] ${msg}`);
 
+function compare(a, b) {
+  const x = a.split('.').map(Number);
+  const y = b.split('.').map(Number);
+  return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
+}
+
+// checkoutVersion is the git checkout's version, or '' in a release
+// package (no server.js beside this file).
+function checkoutVersion() {
+  if (!fs.existsSync(path.join(ROOT, 'server.js'))) return '';
+  return JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+}
+
+// dirOf is where a version's server.js is: app/<version>/, else the
+// checkout itself when it is that version.
+function dirOf(version) {
+  const app = path.join(ROOT, 'app', version);
+  return !fs.existsSync(path.join(app, 'server.js')) && version === checkoutVersion() ? ROOT : app;
+}
+
 function readCurrent() {
-  if (fs.existsSync(CURRENT)) return JSON.parse(fs.readFileSync(CURRENT, 'utf8'));
-  // A first start: the newest version unpacked.
-  const versions = fs.readdirSync(path.join(ROOT, 'app')).filter((v) => /^\d+\.\d+\.\d+$/.test(v) && fs.existsSync(path.join(ROOT, 'app', v, 'server.js')));
-  versions.sort((a, b) => {
-    const x = a.split('.').map(Number);
-    const y = b.split('.').map(Number);
-    return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
-  });
-  if (!versions.length) throw new Error(`no version to start in ${path.join(ROOT, 'app')}`);
+  const checkout = checkoutVersion();
+  if (fs.existsSync(CURRENT)) {
+    const c = JSON.parse(fs.readFileSync(CURRENT, 'utf8'));
+    if (!checkout || compare(checkout, c.version) <= 0) return c;
+    // A git pull past the version that ran: the checkout is the newest.
+    const pulled = { version: checkout, failed: c.failed || [] };
+    writeCurrent(pulled);
+    return pulled;
+  }
+  // A first start: the newest version unpacked, or the checkout.
+  const apps = path.join(ROOT, 'app');
+  const versions = (fs.existsSync(apps) ? fs.readdirSync(apps) : []).filter((v) => /^\d+\.\d+\.\d+$/.test(v) && fs.existsSync(path.join(apps, v, 'server.js')));
+  if (checkout) versions.push(checkout);
+  versions.sort(compare);
+  if (!versions.length) throw new Error(`no version to start in ${apps}`);
   const c = { version: versions[versions.length - 1] };
   writeCurrent(c);
   return c;
@@ -69,7 +100,7 @@ let child = null;
 
 function start(trial) {
   const c = readCurrent();
-  const dir = path.join(ROOT, 'app', c.version);
+  const dir = dirOf(c.version);
   log(`starting Signal Console ${c.version}${trial ? ' (new version, on trial)' : ''}`);
   child = spawn(process.execPath, [path.join(dir, 'server.js')], {
     cwd: dir,
@@ -106,7 +137,7 @@ function start(trial) {
 // run users) on this data.
 const SCRIPTS = { users: 'users.js' };
 if (SCRIPTS[process.argv[2]]) {
-  const dir = path.join(ROOT, 'app', readCurrent().version);
+  const dir = dirOf(readCurrent().version);
   const r = require('child_process').spawnSync(process.execPath, [path.join(dir, 'scripts', SCRIPTS[process.argv[2]]), ...process.argv.slice(3)], { stdio: 'inherit', env: { ...process.env, SIGNAL_CONSOLE_DATA: DATA } });
   process.exit(r.status ?? 1);
 }

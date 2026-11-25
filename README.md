@@ -85,12 +85,24 @@ included in this repository.
 
 **Step 2. Install and start the console.**
 
+Download `signal-console-<version>.zip` from the
+[latest release](https://github.com/intrusion-academy/Signal-Console-Community/releases/latest),
+unzip it into a new folder, and start it there:
+
+```bash
+node launch.js
+```
+
+Or from a clone of this repository:
+
 ```bash
 git clone https://github.com/intrusion-academy/Signal-Console-Community.git
 cd Signal-Console-Community
 npm ci --omit=dev
 npm start
 ```
+
+Either way the console updates itself (see [Updating](#updating)).
 
 On first start, the console asks in the terminal for an administrator name
 and password. It then listens on <http://localhost:7446>. Sign in with that account.
@@ -126,7 +138,7 @@ row to read and triage everything about that entity.
 
 ## Configuration
 
-Set these environment variables before `npm start`:
+Set these environment variables before `node launch.js` or `npm start`:
 
 | Variable | Default | Purpose |
 |---|---|---|
@@ -179,8 +191,20 @@ To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 ## Updating
 
+A console started with `node launch.js` or `npm start` updates itself. Every
+6 hours it reads the signed update file of this repository's latest release;
+a new version is downloaded, checked against the signature, unpacked beside
+the running one in `app/`, and started once the console is idle, with the
+data backed up first. If the new version does not start, the console goes
+back to the previous one and restores the data. **Settings > Updates** shows
+the state, and an administrator can turn automatic updates off.
+
 Your data stays in the data folder (`data/` or `SIGNAL_CONSOLE_DATA`) and is
-kept across updates. Back it up first, then:
+kept across updates.
+
+A console started with `node server.js`, or installed before 1.0.4 from a
+clone, only announces a new version. Update it once by hand, then start it
+with `npm start`:
 
 ```bash
 git pull
@@ -198,7 +222,7 @@ Changes in each release are listed in [CHANGELOG.md](CHANGELOG.md).
 From Intrusion Academy at [intrusion.academy/signal](https://intrusion.academy/signal). It is not in this repository.
 
 **Does the console send data anywhere?**
-It sends no telemetry and no investigation data. Every 6 hours it checks `signal-update.intrusion.academy` for a new version; the request carries nothing about your hosts, and the result is shown on **Settings > Updates**. Lookups in VirusTotal, NVD and the CISA KEV catalog run only when an administrator turns them on or starts them.
+It sends no telemetry and no investigation data. Every 6 hours it reads this repository's update file (its latest release) for a new version; the request carries nothing about your hosts, and the result is shown on **Settings > Updates**. Lookups in VirusTotal, NVD and the CISA KEV catalog run only when an administrator turns them on or starts them.
 
 **Does Signal change the hosts it runs on?**
 No. Signal is read-only: it installs nothing, starts no service and writes only its own run file.

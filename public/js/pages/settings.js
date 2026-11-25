@@ -307,8 +307,8 @@ function updatesView(u) {
     h('div', { class: 'facts' }, h('table', {},
       fact('This Signal Console', h('span', {}, `${u.version} - `, state)),
       fact('How it updates', u.mode === 'managed'
-        ? 'Started by launch.js (a release package): a new version is downloaded, checked against the signed file, unpacked beside this one and, after the data is backed up, started in its place - or rolled back if it does not start.'
-        : 'Not started by launch.js (a git checkout, or node server.js): a new version is announced here and in the banner, never applied - update it by hand (git pull, or the new release package).'),
+        ? 'Started by launch.js (npm start, or node launch.js): a new version is downloaded, checked against the signed file, unpacked beside this one and, after the data is backed up, started in its place - or rolled back if it does not start.'
+        : 'Started with node server.js: a new version is announced here and in the banner, never applied. Start the console with npm start (or node launch.js in a release package) and it updates itself.'),
       fact('Automatic updates', u.auto
         ? 'On - a new version is applied when the console is idle; one that withdraws this version at once, after a two-minute notice.'
         : 'Off - nothing changes by itself; a withdrawn version is shown in red to every user until an admin updates.'),

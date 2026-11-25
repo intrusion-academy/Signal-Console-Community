@@ -7,9 +7,10 @@ the documentation: <https://intrusion.academy/signal/doc/latest>.
 
 Updates from inside the console.
 
-- The first release published with an update file: a console started with `node launch.js` (from the release ZIP) finds this and later versions on Settings > Updates and applies them.
+- The console updates itself, installed from a clone too: `npm start` now starts it through the launcher, which applies a new version in `app/`, backs up the data first, and goes back to the previous version if the new one does not start. A later `git pull` still works: the newest version runs.
+- The README installs from the release ZIP (`node launch.js`), with a clone as the second way.
 - An update package is checked to be this edition's before it is unpacked; any other is refused.
-- To update from 1.0.1-1.0.3: a console started with `node launch.js` updates itself once the release is published. A git checkout: `git pull`, `npm ci`, then restart. Your data folder is kept.
+- To update from 1.0.1-1.0.3 installed from a clone: once by hand - `git pull`, `npm ci --omit=dev`, then `npm start` from now on. A console from the release ZIP started with `node launch.js` updates itself. Your data folder is kept.
 
 ## 1.0.3 - 2026-11-25
 

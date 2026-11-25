@@ -1,6 +1,6 @@
 // Updates (Signal's updates documentation): how Signal Console learns of a new
-// version of itself and of Signal, and - installed from a release package
-// and started by launch.js - updates itself.
+// version of itself and of Signal, and - started by launch.js (a release
+// package's `node launch.js`, a git checkout's `npm start`) - updates itself.
 //
 // The update file, updates.json, is the one Signal reads: an envelope
 // holding the manifest's exact bytes, an Ed25519 signature over them and
@@ -14,8 +14,8 @@
 // Modes: "managed" when launch.js started this console (it sets
 // SIGNAL_CONSOLE_ROOT) - a new version is downloaded, checked, unpacked
 // beside the running one, the data backed up, and the console restarted
-// into it; launch.js rolls back if it does not start. "notify" otherwise (a
-// git checkout, `node server.js`) - the update is announced, never applied.
+// into it; launch.js rolls back if it does not start. "notify" otherwise
+// (`node server.js`) - the update is announced, never applied.
 //
 // Automatic updates are on by default (an admin turns them off). With them
 // on, a new version is applied when the console is idle; one that withdraws
@@ -62,7 +62,8 @@ const BACKUPS_KEPT = 2;
 
 // The install folder (launch.js's) when managed, else ''.
 const ROOT = process.env.SIGNAL_CONSOLE_ROOT || '';
-const managed = () => Boolean(ROOT) && fs.existsSync(path.join(ROOT, 'app'));
+// A git checkout has no app/ folder until its first update unpacks one.
+const managed = () => Boolean(ROOT);
 
 // ---- the file -------------------------------------------------------------
 
@@ -223,7 +224,7 @@ function decide() {
 // schedules the restart into it: at once after the notice when the running
 // version is withdrawn (or an admin asked), else once the console is idle.
 async function apply(now) {
-  if (!managed()) throw new Error('this console was not started by launch.js (a release package): update it by hand - git pull, or the new package');
+  if (!managed()) throw new Error('this console was not started by launch.js: start it with npm start (a git checkout) or node launch.js (a release package)');
   const m = manifest();
   const p = m && m.products[PRODUCT];
   if (!p || compare(p.latest, VERSION) <= 0) throw new Error('no newer version is known');
