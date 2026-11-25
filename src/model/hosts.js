@@ -10,10 +10,9 @@
 'use strict';
 
 // hostOf returns the name the app shows for a run's machine: the live
-// host's name, or the forensic evidence's source path.
+// host's name, else its run ID.
 function hostOf(run) {
   if (run.host && run.host.hostname) return run.host.hostname;
-  if (run.evidence && run.evidence.source) return run.evidence.source;
   return run.run_id;
 }
 

@@ -10,7 +10,7 @@ third-party code. The CycloneDX bill of materials: `npm run sbom`.
 | accepts | 1.3.8 | MIT |
 | append-field | 1.0.0 | MIT |
 | array-flatten | 1.1.1 | MIT |
-| body-parser | 1.20.8 | MIT |
+| body-parser | 1.20.9 | MIT |
 | busboy | 1.6.0 | MIT |
 | bytes | 3.1.2 | MIT |
 | call-bind-apply-helpers | 1.0.2 | MIT |
@@ -53,14 +53,14 @@ third-party code. The CycloneDX bill of materials: `npm run sbom`.
 | mime | 1.6.0 | MIT |
 | ms | 2.0.0 | MIT |
 | ms | 2.1.3 | MIT |
-| multer | 2.4.0 | MIT |
+| multer | 2.5.0 | MIT |
 | negotiator | 0.6.3 | MIT |
 | object-inspect | 1.13.4 | MIT |
 | on-finished | 2.4.1 | MIT |
 | parseurl | 1.3.3 | MIT |
 | path-to-regexp | 0.1.13 | MIT |
 | proxy-addr | 2.0.8 | MIT |
-| qs | 6.16.0 | BSD-3-Clause |
+| qs | 6.16.2 | BSD-3-Clause |
 | range-parser | 1.2.1 | MIT |
 | raw-body | 2.5.3 | MIT |
 | safe-buffer | 5.2.1 | MIT |

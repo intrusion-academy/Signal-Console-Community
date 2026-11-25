@@ -7,7 +7,7 @@
 // this app knows is refused rather than half-understood.
 'use strict';
 
-const { CURRENT } = require('./legacy');
+const { CURRENT, SAME_SHAPE } = require('./legacy');
 const CONSOLE_VERSION = require('../package.json').version;
 
 // RUN_ID_RE is what a run ID may be: Signal writes 16 hex digits; letters,
@@ -39,6 +39,12 @@ function problems(doc) {
   const out = [];
   if (!validRunId(doc.run_id)) out.push('run_id missing or invalid (letters, digits and dashes only)');
   if (!isObject(doc.modules)) out.push('modules must be an object');
+  // Community reads Signal live runs only: any other run (a mode other
+  // than live, schema 64) is refused before anything else is read.
+  if (doc.mode !== undefined && doc.mode !== 'live') {
+    out.push('This run was not made by Signal live; open it in Signal Console Pro.');
+    return out;
+  }
   if (signalMajor(doc.tool_version) < MIN_SIGNAL_MAJOR) {
     out.push(`this run is from Signal ${doc.tool_version || '(version not stated)'}, older than Signal ${MIN_SIGNAL_MAJOR}.0.0 - Signal Console ${CONSOLE_VERSION} accepts runs from Signal ${MIN_SIGNAL_MAJOR}.0.0 or later only, so it was not stored; `
       + `update Signal on the host (signal update) and run it again`);
@@ -50,7 +56,7 @@ function problems(doc) {
       + 'update Signal Console to the version released with that Signal or later, then import the run again'
     );
   }
-  if (out.length || version < CURRENT) return out;
+  if (out.length || version < SAME_SHAPE) return out;
 
   if (!isObject(doc.host) || !isString(doc.host.hostname)) out.push('host.hostname missing');
   if (!Array.isArray(doc.sources)) out.push('sources must be a list');

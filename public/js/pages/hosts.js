@@ -183,7 +183,6 @@ async function renderHostProfile(container, x, hosts) {
         : h('span', { class: 'mut' }, 'none given (or Signal before 0.54.0)')],
       ...(x.profile?.problems?.length ? [['Profile problems', h('span', { class: 'tagtext ev-absent' },
         `${x.profile.problems.length} part(s) left out of the run: ${x.profile.problems.join('; ')}`)]] : []),
-      ...(x.evidence ? [['Evidence source', x.evidence.source], ['Layout', x.evidence.layout]] : []),
     ]),
     factCard('Modules', modNames, x.modules.map((m) => [m.name, h('span', {},
       h('span', { class: 'tagtext ' + (m.status === 'ok' ? 'st-ran' : 'ev-absent') }, m.status),

@@ -600,7 +600,7 @@ const COLUMNS = {
   change_time: { label: 'Change time', icon: 'clock', desc: `When the change was made (UTC).`, render: when },
   os: { label: 'Operating system', icon: 'windows', desc: 'The Windows edition the host runs.', wrap: true, render: (v) => v || '—' },
   os_build: { label: 'Build', icon: 'version', desc: 'The Windows build number.', render: (v) => v || '—' },
-  role: { label: 'Role', icon: 'server', desc: 'Client, Server, Domain Controller - or Evidence, for a forensic collection.' },
+  role: { label: 'Role', icon: 'server', desc: 'Client, Server or Domain Controller.' },
   domain: { label: 'Domain', icon: 'globe', desc: 'The domain (or workgroup) the host belongs to.' },
   tool_version: { label: 'Signal version', icon: 'version', desc: 'The version of Signal that collected the host.' },
   signals_n: { label: 'Signals', icon: 'signals', desc: 'Signals (critical, high, medium or low) on the host, colored by the most severe; opens them on the Signals page.', render: (v, row) => (v ? pageLink('signals', { host: row.run_id }, countCell(v, 'sev-' + row.top_severity)) : countCell(0)) },
@@ -615,7 +615,7 @@ const COLUMNS = {
     render: (v, row) => withTip(h('span', {}, countCell(v, 'sev-high'), row.telemetry_unknown_n ? h('span', { class: 'mut' }, ` · ${row.telemetry_unknown_n} unknown`) : null),
       (row.telemetry || []).filter((t) => t.state !== 'on').map((t) => h('span', {}, `${t.state}: ${t.label}`)).concat(row.telemetry && row.telemetry.every((t) => t.state === 'on') ? [h('span', {}, 'everything on')] : [])),
   },
-  mode: { label: 'Mode', icon: 'mode', desc: 'live (the running system) or forensics (collected evidence).' },
+  mode: { label: 'Mode', icon: 'mode', desc: 'live: Signal read the running system.' },
   started: { label: 'Collected', icon: 'clock', desc: `When Signal ran on the host (UTC).`, render: when },
   modules: { label: 'Modules', icon: 'module', desc: 'The Signal modules the run included.', wrap: true, render: (v) => truncatedList(v) },
   run: { label: 'Run ID', icon: 'id', desc: 'The run\'s unique ID. Remove deletes the imported run from this app (not from the host).' },
@@ -900,9 +900,10 @@ export function sourcesView(sources, name) {
   ];
   if (!('status' in sources[0])) {
     const hostsCol = (key, label, cls, icon) => col(key, 'count', { label, icon, desc: `Hosts whose evidence was ${label.toLowerCase()}.`, render: (v) => (v ? h('span', { class: 'tagtext ' + cls }, String(v)) : h('span', { class: 'mut' }, '0')) });
-    return dataTable(sources, [col('label', 'source'), hostsCol('read', 'Read', 'st-ran', 'success'), hostsCol('partial', 'Partly read', 'ev-absent', 'notEvaluated'),
-      hostsCol('not_read', 'Not read', 'sev-high', 'failure'), hostsCol('off', 'Off - not recorded', 'ev-absent', 'ruleOff'), hostsCol('unavailable', 'No source', 'mut', 'ruleOff'), col('records'), ...span],
-    { filename: 'fleet-sources', rowKey: (r) => r.evidence });
+    const counts = [hostsCol('read', 'Read', 'st-ran', 'success'), hostsCol('partial', 'Partly read', 'ev-absent', 'notEvaluated'),
+      hostsCol('not_read', 'Not read', 'sev-high', 'failure'), hostsCol('off', 'Off - not recorded', 'ev-absent', 'ruleOff'), hostsCol('unavailable', 'No source', 'mut', 'ruleOff')];
+    return dataTable(sources, [col('label', 'source'), ...counts, col('records'), ...span],
+      { filename: 'fleet-sources', rowKey: (r) => r.evidence });
   }
   const cols = [col('label', 'source'), col('state', 'source_status'), col('records'), col('note', 'source_reason'), ...span, col('prerequisites')];
   return dataTable(sources, cols, { filename: `${name}-sources`, rowKey: (r) => r.evidence });

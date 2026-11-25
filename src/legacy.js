@@ -86,8 +86,12 @@
 // Audit holds only the Security log's items - Group Policy's run of the
 // logging settings is a Logging setting; two labels name the Security log.
 // Schema 63: a catalog entry's fields is the list of field names, what each
-// means in the run's field_docs once (upgradeFieldDocs).
-const CURRENT = 63;
+// means in the run's field_docs once (upgradeFieldDocs). Schema 64: a run states its mode, and
+// Signal's other products add their own block;
+// a live run's shape is unchanged, so a schema-63 run is current in all but
+// its number (SAME_SHAPE) - read whole, never called older output.
+const CURRENT = 64;
+const SAME_SHAPE = 63;
 
 // LABELS_62 are the schema-62 labels of items whose earlier labels did not
 // say they are the Security log's.
@@ -375,7 +379,10 @@ function upgrade(run) {
   // Signal 0.45.0-0.53.0 wrote a host without shadow copies' copies as
   // null: none, a list like any other.
   if (run.shadow_copies && run.shadow_copies.copies === null) run.shadow_copies.copies = [];
-  if (from >= CURRENT) return run;
+  if (from >= SAME_SHAPE) {
+    run.schema_version = CURRENT;
+    return run;
+  }
   for (const [name, r] of Object.entries(run.modules || {})) {
     if (r.findings) r.findings = r.findings.filter((f) => !isInsight(f)); // schema 9 and earlier
     if (r.rule_catalog) r.rule_catalog = r.rule_catalog.filter((e) => !isInsight(e));
@@ -408,4 +415,4 @@ function olderOutput(run) {
     + 'It was upgraded on import, but what later versions of Signal report is not in it - missing, not "none". Re-run the host with the current Signal.';
 }
 
-module.exports = { upgrade, CURRENT, OBSERVED, olderOutput };
+module.exports = { upgrade, CURRENT, SAME_SHAPE, OBSERVED, olderOutput };
