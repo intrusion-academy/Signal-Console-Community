@@ -3,6 +3,14 @@
 Releases of Signal Console Community. The full release notes of Signal are in
 the documentation: <https://intrusion.academy/signal/doc/latest>.
 
+## 1.0.4 - 2026-11-25
+
+Updates from inside the console.
+
+- The first release published with an update file: a console started with `node launch.js` (from the release ZIP) finds this and later versions on Settings > Updates and applies them.
+- An update package is checked to be this edition's before it is unpacked; any other is refused.
+- To update from 1.0.1-1.0.3: a console started with `node launch.js` updates itself once the release is published. A git checkout: `git pull`, `npm ci`, then restart. Your data folder is kept.
+
 ## 1.0.3 - 2026-11-25
 
 A security update of third-party packages. No change to what the console does.

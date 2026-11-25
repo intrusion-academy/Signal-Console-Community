@@ -32,7 +32,10 @@ const db = require('./db');
 const tasks = require('./tasks');
 const { unzip } = require('./zip');
 
-const VERSION = require('../package.json').version;
+const { version: VERSION, name: PACKAGE } = require('../package.json');
+// PRODUCT is this edition's entry in the update file, so an edition never
+// takes the other's package (PROBLEM_REGISTER 187). Community keeps the
+// name its first releases (1.0.1-1.0.3) read, so they update unchanged.
 const PRODUCT = 'signal-console';
 const FORMAT = 1;
 
@@ -42,9 +45,11 @@ const KEYS = {
   '85cd7db0': 'a5Bj22Wh8qKRMBqD9JxogDKUKSRY+XiN3sPYpxeHGSk=', // backup, kept offline
 };
 
-// SOURCES are where the update file is looked for: the public Community
-// repository's latest release, then its main branch. Signal itself no longer
-// has a list (the signal-update subdomain was removed 2026-11-10).
+// SOURCES are where the update file is looked for. Each edition reads only
+// its own places: Community the public repository's latest release, then its
+// main branch. Pro has no public place yet (it is not released), so it reads
+// none - only places an admin adds. Signal itself no longer has a list (the
+// signal-update subdomain was removed 2026-11-10).
 const SOURCES = [
   'https://github.com/intrusion-academy/Signal-Console-Community/releases/latest/download/updates.json',
   'https://raw.githubusercontent.com/intrusion-academy/Signal-Console-Community/main/updates.json',
@@ -254,7 +259,9 @@ function checkPackage(p, pkg) {
 // install unpacks a checked package's app/<version>/ beside the running
 // version (a .partial folder renamed when complete). launch.js and the data
 // are never touched by an update.
-async function install(p, pkg) {
+// packageFiles checks a downloaded package and returns its app files: the
+// signed size and hash, the version, server.js, and this edition's name.
+function packageFiles(p, pkg) {
   checkPackage(p, pkg);
   const prefix = `app/${p.latest}/`;
   const files = unzip(pkg).filter((f) => f.name.startsWith(prefix));
@@ -262,6 +269,15 @@ async function install(p, pkg) {
   if (!pj || JSON.parse(pj.data).version !== p.latest || !files.some((f) => f.name === `${prefix}server.js`)) {
     throw new Error(`the package does not hold Signal Console ${p.latest} (${prefix}package.json, server.js)`);
   }
+  // A second guard beside PRODUCT: never unpack the other edition's package.
+  const name = JSON.parse(pj.data).name;
+  if (name !== PACKAGE) throw new Error(`the package is ${name}, not this edition (${PACKAGE}) - refused`);
+  return files;
+}
+
+async function install(p, pkg) {
+  const prefix = `app/${p.latest}/`;
+  const files = packageFiles(p, pkg);
   const final = path.join(ROOT, 'app', p.latest);
   const partial = `${final}.partial`;
   fs.rmSync(partial, { recursive: true, force: true });
@@ -423,6 +439,6 @@ function start() {
 }
 
 module.exports = {
-  KEYS, SOURCES, FORMAT, compare, verify, withdrawalOf, checkPackage,
+  KEYS, SOURCES, PRODUCT, PACKAGE, FORMAT, packageFiles, compare, verify, withdrawalOf, checkPackage,
   start, checkNow, upload, apply, status, settings, signalWithdrawal, markWithdrawn, track,
 };
